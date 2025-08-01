@@ -1,0 +1,63 @@
+{
+  "auctions": [
+    {
+      "title": "Nintendo Switch OLED",
+      "description": "Brand new Nintendo Switch OLED model",
+      "startingPrice": 5,
+      "currentBid": 8,
+      "endTime": "2025-08-15T20:00:00Z",
+      "imageUrl": "https://example.com/switch.jpg",
+      "status": "active",
+      "createdAt": "2025-07-29T20:00:00Z"
+    },
+    {
+      "title": "Apple AirPods Pro 2",
+      "description": "Latest AirPods Pro 2nd generation",
+      "startingPrice": 3,
+      "currentBid": 5,
+      "endTime": "2025-08-10T18:00:00Z",
+      "imageUrl": "https://example.com/airpods.jpg",
+      "status": "active",
+      "createdAt": "2025-07-29T21:00:00Z"
+    }
+  ],
+
+  "marketplace": [
+    {
+      "title": "Custom Gaming Mouse",
+      "description": "RGB wired gaming mouse, lightly used",
+      "price": 15,
+      "imageUrl": "https://example.com/mouse.jpg",
+      "sellerId": "user123",
+      "createdAt": "2025-07-29T22:00:00Z"
+    }
+  ],
+
+  "tokens": [
+    {
+      "userId": "user123",
+      "balance": 100,
+      "lastUpdated": "2025-07-29T20:00:00Z"
+    },
+    {
+      "userId": "user456",
+      "balance": 50,
+      "lastUpdated": "2025-07-29T20:00:00Z"
+    }
+  ],
+
+  "users": [
+    {
+      "username": "testuser",
+      "email": "test@snaggle.fun",
+      "balance": 100,
+      "createdAt": "2025-07-29T20:00:00Z"
+    },
+    {
+      "username": "johndoe",
+      "email": "john@snaggle.fun",
+      "balance": 75,
+      "createdAt": "2025-07-29T20:00:00Z"
+    }
+  ]
+}

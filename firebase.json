@@ -1,0 +1,26 @@
+{
+  // Firebase Hosting configuration
+  "hosting": {
+    // The directory that will be deployed to Firebase Hosting.  Running
+    // `next build && next export` will generate a static site into this
+    // directory.
+    "public": "out",
+    // Files matching these patterns will not be uploaded.
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    // Clean URLs remove the `.html` extension from paths.  For example,
+    // `/about.html` becomes `/about`.
+    "cleanUrls": true,
+    // Rewrite all unmatched URLs to `/index.html`.  This allows your Next.js
+    // application to handle client-side routing on static hosting.
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
