@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
@@ -14,14 +15,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-export default function TestPage() {
+// Disable SSR by using dynamic import
+const TestPage = dynamic(() => import('./TestPage'), { ssr: false });
+
+export default function TestPageWrapper() {
   const [data, setData] = useState(null);
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This ensures data is fetched only on the client side
-    setIsClient(true);
-
     async function fetchCollections() {
       const collections = ["auctions", "marketplace", "tokens", "users"];
       let results = {};
@@ -32,21 +32,14 @@ export default function TestPage() {
           results[col] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         }
         setData(results);
-        console.log("Firestore fetch result:", results); // Log inside the client-side effect
+        console.log("Firestore fetch result:", results);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
-    if (isClient) {
-      fetchCollections();
-    }
-  }, [isClient]);
-
-  // Render loading until we know we're on the client-side
-  if (!isClient) {
-    return <div>Loading...</div>;
-  }
+    fetchCollections();
+  }, []);
 
   return (
     <div style={{ padding: 20 }}>
