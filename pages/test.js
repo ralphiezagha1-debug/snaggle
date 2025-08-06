@@ -26,6 +26,7 @@ export default function TestPage() {
         results[col] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       }
       setData(results);
+      console.log("Firestore fetch result:", results);  // Now logging inside useEffect
     }
     fetchCollections();
   }, []);
@@ -37,5 +38,5 @@ export default function TestPage() {
     </div>
   );
 }
-console.log("Env check:", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
-console.log("Firestore fetch result:", results);
+
+console.log("Env check:", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID); // This will still work
