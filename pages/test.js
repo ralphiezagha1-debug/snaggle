@@ -16,27 +16,37 @@ const db = getFirestore(app);
 
 export default function TestPage() {
   const [data, setData] = useState(null);
+  const [isClient, setIsClient] = useState(false);
 
-  // Only fetch data once, not on every render
   useEffect(() => {
+    // This ensures data is fetched only on the client side
+    setIsClient(true);
+
     async function fetchCollections() {
       const collections = ["auctions", "marketplace", "tokens", "users"];
-      let results = {}; // Define results here inside the async function
+      let results = {};
 
       try {
         for (const col of collections) {
           const snap = await getDocs(collection(db, col));
           results[col] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         }
-        setData(results); // Store data in state once all collections are fetched
-        console.log("Firestore fetch result:", results); // Log results once data is set
+        setData(results);
+        console.log("Firestore fetch result:", results); // Log inside the client-side effect
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
-    fetchCollections(); // Call the async function
-  }, []); // Empty dependency array ensures the effect only runs once
+    if (isClient) {
+      fetchCollections();
+    }
+  }, [isClient]);
+
+  // Render loading until we know we're on the client-side
+  if (!isClient) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div style={{ padding: 20 }}>
