@@ -17,19 +17,26 @@ const db = getFirestore(app);
 export default function TestPage() {
   const [data, setData] = useState(null);
 
+  // Only fetch data once, not on every render
   useEffect(() => {
     async function fetchCollections() {
       const collections = ["auctions", "marketplace", "tokens", "users"];
-      let results = {};
-      for (const col of collections) {
-        const snap = await getDocs(collection(db, col));
-        results[col] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      let results = {}; // Define results here inside the async function
+
+      try {
+        for (const col of collections) {
+          const snap = await getDocs(collection(db, col));
+          results[col] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        }
+        setData(results); // Store data in state once all collections are fetched
+        console.log("Firestore fetch result:", results); // Log results once data is set
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-      setData(results);
-      console.log("Firestore fetch result:", results);  // Now logging inside useEffect
     }
-    fetchCollections();
-  }, []);
+
+    fetchCollections(); // Call the async function
+  }, []); // Empty dependency array ensures the effect only runs once
 
   return (
     <div style={{ padding: 20 }}>
@@ -39,4 +46,4 @@ export default function TestPage() {
   );
 }
 
-console.log("Env check:", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID); // This will still work
+console.log("Env check:", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
