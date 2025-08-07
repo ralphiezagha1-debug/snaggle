@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
@@ -22,16 +22,14 @@ jobs:
         run: npm install
 
       - name: Build project
-        run: |
-          npm run build
-          npx next export
+        run: npm run build
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
 
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@v2.2.0
-        with:
-          args: deploy --only hosting
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > ./firebase-service-account.json
+          firebase deploy --only hosting,functions --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
         env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          GIT_SNAGGLE_TOKEN: ${{ secrets.GIT_SNAGGLE_TOKEN }}
+          GOOGLE_APPLICATION_CREDENTIALS: ./firebase-service-account.json
