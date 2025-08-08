@@ -1,4 +1,7 @@
 import { useState } from "react";
+// Import the Firestore and Storage instances from our firebase client helper.  The
+// helper re-exports `db` and `storage` from `src/firebase.js` so that they can
+// be used in TypeScript files without causing module resolution errors.
 import { db, storage } from "@/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -12,7 +15,8 @@ export default function CreateAuction() {
     try {
       let imageUrl = "";
       if (image) {
-        const storageRef = ref(storage, \`auctions/\${image.name}\`);
+        // Store uploaded images in a folder named `auctions/` in Cloud Storage
+        const storageRef = ref(storage, `auctions/${image.name}`);
         await uploadBytes(storageRef, image);
         imageUrl = await getDownloadURL(storageRef);
       }

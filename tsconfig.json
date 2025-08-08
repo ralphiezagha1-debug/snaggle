@@ -17,6 +17,18 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    // Configure baseUrl and path aliases so that imports using the `@/` prefix
+    // correctly resolve to files in the project root as well as the `src/`
+    // directory. Without these settings, TypeScript and Next.js may fail to
+    // resolve modules like `@/components/Header` when the file lives outside
+    // of `src/`.
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*",
+        "./*"
+      ]
+    },
     "plugins": [
       {
         "name": "next"

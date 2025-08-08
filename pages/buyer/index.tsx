@@ -6,7 +6,12 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase";
 
 export default function BuyerHome() {
-  const [auctions, setAuctions] = useState([]);
+  // Specify a generic type for the auctions array. Without this, TypeScript
+  // infers the initial empty array as `never[]`, which causes type errors
+  // when assigning an array of auction objects later on. Using `any[]` here
+  // is acceptable for prototyping; if your project has defined types for
+  // auctions you can replace `any` with that interface.
+  const [auctions, setAuctions] = useState<any[]>([]);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "auctions"), (snapshot) => {

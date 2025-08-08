@@ -11,6 +11,15 @@
 const nextConfig = {
   // Enable static export
   output: 'export',
+  // Disable the built‑in Image Optimization API when using static export.  The
+  // `next export` command cannot run the image optimizer at build time, so
+  // setting `images.unoptimized = true` prevents build warnings and ensures
+  // that the default HTML <img> tag is used instead of the Next.js Image
+  // component. See https://nextjs.org/docs/messages/export-image-api for
+  // details.
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;

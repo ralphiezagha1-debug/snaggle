@@ -8,8 +8,8 @@
 // project's configuration.
 
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 // Only initialize Firebase if it hasn't been initialized yet.  Next.js's
 // hot-reloading can cause this module to be loaded multiple times in
@@ -29,7 +29,11 @@ if (!getApps().length) {
   app = getApps()[0];
 }
 
-// Export the Firebase Auth and Firestore instances.  These can be imported
-// elsewhere in your application to interact with Firebase services.
-export const auth = getAuth(app);
+// Export the Firestore instance.  We intentionally do not initialize or
+// export the Auth SDK during the build because a missing or invalid API key
+// causes Firebase to throw an `auth/invalid-api-key` error at build time.
+// If authentication is needed in the future, consider lazy-loading the
+// Auth module in client-only code after environment variables are set.
 export const db = getFirestore(app);
+// Export the default Cloud Storage instance so components/pages can upload files
+export const storage = getStorage(app);
