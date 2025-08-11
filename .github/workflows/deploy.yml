@@ -1,0 +1,121 @@
+name: Build • Preview • Test • Deploy (Firebase Hosting)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  NODE_VERSION: '20'
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  HOSTING_SITE: ${{ secrets.HOST || 'snaggle-fun' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install deps
+        run: |
+          npm ci || npm install
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Build
+        run: npm run build
+
+      - name: Static export (optional)
+        run: npm run export --if-present || true
+
+      - name: Prepare artifacts
+        run: |
+          mkdir -p artifacts
+          zip -rq artifacts/snaggle-build.zip . -x             "node_modules/*" ".git/*" ".next/cache/*" "artifacts/*"
+          echo "OUT_DIR exists?"; ls -la ./out || true
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snaggle-build
+          path: artifacts/snaggle-build.zip
+          if-no-files-found: warn
+
+  deploy-preview:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Firebase auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools
+
+      - name: Deploy to preview channel
+        id: preview
+        run: |
+          CHANNEL="ci-${{ github.run_id }}"
+          firebase hosting:channel:deploy "$CHANNEL"             --project "$FIREBASE_PROJECT_ID"             --json > preview.json
+          PREVIEW_URL=$(node -e "console.log(require('./preview.json').result[0].url)")
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test preview
+        id: smoketest
+        run: |
+          URL="${{ steps.preview.outputs.preview_url }}"
+          echo "Hitting $URL ..."
+          for i in {1..10}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || true)
+            if [ "$code" = "200" ] || [ "$code" = "304" ]; then
+              echo "OK $code"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Preview smoke test failed"
+          exit 1
+
+  promote:
+    needs: deploy-preview
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Firebase auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools
+
+      - name: Deploy to live (snaggle-fun)
+        run: |
+          firebase deploy --only hosting             --project "$FIREBASE_PROJECT_ID"
+
+  rollback-on-fail:
+    needs: [deploy-preview, promote]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain failure
+        run: |
+          echo "::error::Build/preview/promote failed. Live site left unchanged."
+          echo "If a live deploy partially occurred, use Firebase Hosting 'view history' to rollback to the prior release."
