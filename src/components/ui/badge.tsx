@@ -1,42 +1,10 @@
-﻿/* eslint-disable react-refresh/only-export-components */
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-
-import { cn } from "@/lib/utils"
-
-const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-export type BadgeProps = React.HTMLAttributes<<HTMLDivElement>> &;;
-
-
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  )
-}
-
-export { Badge, badgeVariants }
-
-
-
-
-
-
-
+﻿import * as React from "react";
+function cx(...c:(string|undefined)[]){return c.filter(Boolean).join(" ");}
+export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & { variant?: "default"|"secondary"|"destructive"|"outline" };
+export const Badge = React.forwardRef<HTMLSpanElement,BadgeProps>(({ className, variant="default", ...props }, ref) => (
+  <span ref={ref} className={cx("inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+    variant==="default"?"border-transparent bg-black/80 text-white":
+    variant==="secondary"?"border-transparent bg-gray-200 text-gray-900":
+    variant==="destructive"?"border-transparent bg-red-600 text-white":"border-gray-300 text-gray-900", className)} {...props} />
+));
+Badge.displayName = "Badge"; export default Badge;
