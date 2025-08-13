@@ -1,3 +1,4 @@
+﻿/* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
@@ -23,9 +24,8 @@ const badgeVariants = cva(
   }
 )
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+export type BadgeProps = React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> 
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return (
@@ -34,3 +34,5 @@ function Badge({ className, variant, ...props }: BadgeProps) {
 }
 
 export { Badge, badgeVariants }
+
+
