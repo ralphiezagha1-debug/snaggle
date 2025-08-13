@@ -1,4 +1,5 @@
-﻿import * as SheetPrimitive from "@radix-ui/react-dialog"
+﻿/* eslint-disable react-refresh/only-export-components */
+import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 import * as React from "react"
@@ -48,7 +49,6 @@ const sheetVariants = cva(
 )
 
 type SheetContentProps = React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-  VariantProps<typeof sheetVariants> 
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
@@ -127,5 +127,7 @@ export {
   Sheet, SheetClose,
   SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetOverlay, SheetPortal, SheetTitle, SheetTrigger
 }
+
+
 
 

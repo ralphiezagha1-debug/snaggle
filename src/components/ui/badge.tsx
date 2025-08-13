@@ -1,4 +1,5 @@
-﻿import * as React from "react"
+﻿/* eslint-disable react-refresh/only-export-components */
+import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
@@ -22,9 +23,8 @@ const badgeVariants = cva(
     },
   }
 )
-export type BadgeProps = React.HTMLAttributes<HTMLDivElement> &
-  VariantProps<typeof badgeVariants>;
-    VariantProps<typeof badgeVariants> 
+export type BadgeProps = React.HTMLAttributes<<HTMLDivElement>> &;;
+
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return (
@@ -33,6 +33,8 @@ function Badge({ className, variant, ...props }: BadgeProps) {
 }
 
 export { Badge, badgeVariants }
+
+
 
 
 
