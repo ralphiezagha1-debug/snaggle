@@ -35,3 +35,4 @@ jobs:
           projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
           target: snaggle-fun
 
+

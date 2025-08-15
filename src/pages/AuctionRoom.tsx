@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +15,7 @@ import macbookImage from '@/assets/macbook-hero.jpg';
 type AuctionStatus = 'LIVE' | 'SCHEDULED' | 'ENDED';
 
 interface AuctionData {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   images: string[];
@@ -31,7 +31,7 @@ interface AuctionData {
 }
 
 const mockAuction: AuctionData = {
-  id: '1',
+  _id: '1',
   title: 'MacBook Pro 16" M3 Max - Latest Model',
   description: 'Brand new MacBook Pro with M3 Max chip, 32GB RAM, 1TB SSD. Perfect for creative professionals and developers.',
   images: [macbookImage, macbookImage, macbookImage],
@@ -47,15 +47,15 @@ const mockAuction: AuctionData = {
 };
 
 const mockBids = [
-  { id: '1', userId: '1', userName: 'Alice_2024', price: 47.23, timestamp: new Date(Date.now() - 5000), isWinning: true },
-  { id: '2', userId: '2', userName: 'BidMaster', price: 47.22, timestamp: new Date(Date.now() - 15000) },
-  { id: '3', userId: '3', userName: 'QuickBidder', price: 47.21, timestamp: new Date(Date.now() - 25000) },
-  { id: '4', userId: '1', userName: 'Alice_2024', price: 47.20, timestamp: new Date(Date.now() - 35000) },
-  { id: '5', userId: '4', userName: 'AuctionFan', price: 47.19, timestamp: new Date(Date.now() - 45000) },
+  { _id: '1', userId: '1', userName: 'Alice_2024', price: 47.23, timestamp: new Date(Date.now() - 5000), isWinning: true },
+  { _id: '2', userId: '2', userName: 'BidMaster', price: 47.22, timestamp: new Date(Date.now() - 15000) },
+  { _id: '3', userId: '3', userName: 'QuickBidder', price: 47.21, timestamp: new Date(Date.now() - 25000) },
+  { _id: '4', userId: '1', userName: 'Alice_2024', price: 47.20, timestamp: new Date(Date.now() - 35000) },
+  { _id: '5', userId: '4', userName: 'AuctionFan', price: 47.19, timestamp: new Date(Date.now() - 45000) },
 ];
 
 const AuctionRoom = () => {
-  const { id } = useParams();
+  const { _id } = useParams();
   const { toast } = useToast();
   const [auction, setAuction] = useState(mockAuction);
   const [bids, setBids] = useState(mockBids);
@@ -69,7 +69,7 @@ const AuctionRoom = () => {
       // Randomly add new bids (simulation)
       if (Math.random() > 0.7) {
         const newBid = {
-          id: Date.now().toString(),
+          _id: Date.now().toString(),
           userId: Math.floor(Math.random() * 5).toString(),
           userName: ['Alice_2024', 'BidMaster', 'QuickBidder', 'AuctionFan', 'ProBidder'][Math.floor(Math.random() * 5)],
           price: auction.currentPrice + 0.01,
@@ -105,7 +105,7 @@ const AuctionRoom = () => {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     const newBid = {
-      id: Date.now().toString(),
+      _id: Date.now().toString(),
       userId: 'current-user',
       userName: 'You',
       price: auction.currentPrice + 0.01,
@@ -134,7 +134,7 @@ const AuctionRoom = () => {
     
     if (auction.lastBidder === 'You') {
       toast({
-        title: "🎉 Congratulations! You Won!",
+        title: "ðŸŽ‰ Congratulations! You Won!",
         description: `You won the ${auction.title} for $${auction.currentPrice.toFixed(2)}!`,
       });
     } else {

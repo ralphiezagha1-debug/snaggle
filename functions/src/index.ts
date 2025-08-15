@@ -4,7 +4,7 @@ import * as admin from "firebase-admin";
 // Initialize admin SDK once
 try {
   admin.initializeApp();
-} catch (e) {
+} catch (_e) {
   // ignore if already initialized
 }
 
@@ -20,8 +20,8 @@ export const setAdminClaim = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError("unauthenticated", "Must be signed in.");
   }
-  const callerUid = context.auth.uid;
-  const callerToken = context.auth.token as any;
+  const _callerUid = context.auth.uid;
+  const callerToken = context.auth.token as unknown;
   if (!callerToken.admin) {
     throw new functions.https.HttpsError("permission-denied", "Admin only.");
   }
@@ -49,3 +49,6 @@ export const whoAmI = functions.https.onCall(async (_data, context) => {
     claims: context.auth.token,
   };
 });
+
+
+

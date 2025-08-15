@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { AuctionCard } from '@/components/auction/AuctionCard';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Gavel, Zap, Trophy, Clock, Users, Star } from 'lucide-react';
@@ -288,3 +287,4 @@ const Index = () => {
 };
 
 export default Index;
+
