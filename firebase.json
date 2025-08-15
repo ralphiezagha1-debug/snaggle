@@ -1,11 +1,10 @@
 ﻿{
-  "hosting": {
-    "site": "snaggle-ed88d",
-    "public": "dist",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "cleanUrls": true,
-    "rewrites": [
-      { "source": "/health", "function": "health" }
-    ]
-  }
+  "projects": { "default": "snaggle-ed88d" },
+  "hosting": [
+    {
+      "site": "snaggle-ed88d",
+      "public": "dist",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    }
+  ]
 }
