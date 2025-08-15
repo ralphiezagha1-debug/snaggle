@@ -1,4 +1,4 @@
-ï»¿name: Build â€¢ Preview â€¢ Deploy (Firebase Hosting)
+name: Build • Preview • Deploy (Firebase Hosting)
 on:
   push:
     branches: [ main ]
