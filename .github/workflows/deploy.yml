@@ -58,6 +58,6 @@ jobs:
           npx firebase-tools --version
           npx firebase-tools hosting:deploy \
             --project "${{ secrets.FIREBASE_PROJECT_ID }}" \
-            --only hosting:'$Site' \
+            --site snaggle-ed88d \
             --non-interactive \
             --token "${{ secrets.FIREBASE_TOKEN }}"
