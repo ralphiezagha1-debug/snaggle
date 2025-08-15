@@ -17,22 +17,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Use Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-
       - name: Install deps
         run: npm ci || npm install
-
       - name: Lint
         run: npm run lint --if-present
-
       - name: Build (Vite -> dist)
         run: npm run build
-
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:
@@ -46,18 +41,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Download dist
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-
-      - name: Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting (debug + deploy)
         run: |
           npx firebase-tools --version
-          npx firebase-tools deploy --project "${{ secrets.FIREBASE_PROJECT_ID }}" --only hosting:snaggle-ed88d --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
-            --project "${{ secrets.FIREBASE_PROJECT_ID }}" \
-            --site snaggle-ed88d \
+          npx firebase-tools projects:list --token "${{ secrets.FIREBASE_TOKEN }}"
+          npx firebase-tools deploy \
+            --project "snaggle-ed88d" \
+            --only "hosting:snaggle-ed88d" \
             --non-interactive \
             --token "${{ secrets.FIREBASE_TOKEN }}"
