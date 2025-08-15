@@ -1,0 +1,4 @@
+﻿{
+  "projects": { "default": "snaggle-fun" },
+  "targets": { "snaggle-fun": { "hosting": { "prod": ["snaggle-fun"] } } }
+}
