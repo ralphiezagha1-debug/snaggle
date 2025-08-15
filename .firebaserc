@@ -1,4 +1,10 @@
 ﻿{
-  "projects": { "default": "snaggle-fun" },
-  "targets": { "snaggle-fun": { "hosting": { "prod": ["snaggle-fun"] } } }
+  "projects": { "default": "snaggle-ed88d" },
+  "targets": {
+    "snaggle-ed88d": {
+      "hosting": {
+        "snaggle-ed88d": ["snaggle-ed88d"]
+      }
+    }
+  }
 }

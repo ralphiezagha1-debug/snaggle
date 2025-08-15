@@ -1,17 +1,11 @@
 ﻿{
   "hosting": {
-    "site": "snaggle-fun",
+    "site": "snaggle-ed88d",
     "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "cleanUrls": true,
-    "trailingSlash": false,
-    "headers": [
-      { "source": "**/*.@(js|css|svg|png|jpg|jpeg|webp|ico)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
-    ],
     "rewrites": [
-      { "source": "/health", "function": "health" },
-      { "source": "**", "destination": "/index.html" }
+      { "source": "/health", "function": "health" }
     ]
-  },
-  "functions": { "source": "functions" }
+  }
 }
