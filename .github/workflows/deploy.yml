@@ -56,7 +56,7 @@ jobs:
       - name: Deploy to Firebase Hosting
         run: |
           npx firebase-tools --version
-          npx firebase-tools hosting:deploy \
+          npx firebase-tools deploy --project "${{ secrets.FIREBASE_PROJECT_ID }}" --only hosting:snaggle-ed88d --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
             --project "${{ secrets.FIREBASE_PROJECT_ID }}" \
             --site snaggle-ed88d \
             --non-interactive \
