@@ -39,10 +39,11 @@ jobs:
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
 
-      - name: Deploy rules & indexes (Firestore + Storage)
+      # Use top-level resources instead of subtargets
+      - name: Deploy Firestore & Storage
         run: |
           npm i -g firebase-tools
-          firebase deploy --only "firestore:rules,firestore:indexes,storage" --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
+          firebase deploy --only firestore,storage --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
 
       - name: Deploy Hosting
         run: firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
