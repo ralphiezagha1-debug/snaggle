@@ -1,4 +1,4 @@
-﻿name: Build • Preview • Deploy (Firebase Hosting)
+﻿name: Deploy (Firebase)
 
 on:
   push:
@@ -7,51 +7,42 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: '20'
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Use Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
+
       - name: Install deps
         run: npm ci || npm install
+
       - name: Lint
         run: npm run lint --if-present
-      - name: Build (Vite -> dist)
-        run: npm run build
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-          if-no-files-found: error
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download dist
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist
-      - name: Deploy to Firebase Hosting (debug + deploy)
+      - name: Build
+        run: npm run build
+
+      - name: Write service account file
+        shell: bash
         run: |
-          npx firebase-tools --version
-          npx firebase-tools projects:list --token "${{ secrets.FIREBASE_TOKEN }}"
-          npx firebase-tools deploy \
-            --project "snaggle-ed88d" \
-            --only "hosting:snaggle-ed88d" \
-            --non-interactive \
-            --token "${{ secrets.FIREBASE_TOKEN }}"
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+
+      - name: Deploy rules & indexes (Firestore + Storage)
+        run: |
+          npm i -g firebase-tools
+          firebase deploy --only "firestore:rules,firestore:indexes,storage" --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
+
+      - name: Deploy Hosting
+        run: firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
