@@ -1,10 +1,16 @@
 ﻿{
-  "projects": { "default": "snaggle-ed88d" },
-  "hosting": [
-    {
-      "site": "snaggle-ed88d",
-      "public": "dist",
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
-    }
-  ]
+    "projects":  {
+                     "default":  "snaggle-ed88d"
+                 },
+    "hosting":  [
+                    {
+                        "site":  "snaggle-ed88d",
+                        "public":  "dist",
+                        "ignore":  [
+                                       "firebase.json",
+                                       "**/.*",
+                                       "**/node_modules/**"
+                                   ]
+                    }
+                ]
 }
