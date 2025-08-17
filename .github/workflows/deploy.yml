@@ -12,6 +12,7 @@ permissions:
 env:
   NODE_VERSION: '20'
   FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  FIREBASE_SKIP_DEPLOY_PREREQS: 'true'   # <-- skip API checks; we enabled them already
 
 jobs:
   deploy:
@@ -39,7 +40,6 @@ jobs:
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
 
-      # Use top-level resources instead of subtargets
       - name: Deploy Firestore & Storage
         run: |
           npm i -g firebase-tools
