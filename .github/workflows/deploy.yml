@@ -1,5 +1,4 @@
-# .github/workflows/deploy.yml
-name: Build • Preview • Deploy (Firebase Hosting)
+﻿name: Build • Preview • Deploy (Firebase Hosting)
 
 on:
   push:
@@ -21,13 +20,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
+          cache: 'npm'
       - name: Install deps
         run: npm ci || npm install
       - name: Lint
         run: npm run lint --if-present
       - name: Typecheck
-        run: npm run typecheck --if-present || true
+        run: npm run typecheck --if-present
       - name: Build (Vite -> dist)
         run: npm run build
       - name: Upload dist artifact
@@ -40,22 +39,24 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-      - name: Setup Firebase Tools
-        uses: firebase/actions/setup-firebasetools@v13
-      - name: Firebase Deploy (Hosting)
-        env:
-          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          HOSTING_SITE: ${{ secrets.HOSTING_SITE }}
-        run: |
-          echo "$FIREBASE_SERVICE_ACCOUNT" > ${GITHUB_WORKSPACE}/sa.json
-          export GOOGLE_APPLICATION_CREDENTIALS=${GITHUB_WORKSPACE}/sa.json
-          firebase use "$FIREBASE_PROJECT_ID"
-          test "$HOSTING_SITE" = "snaggle-ed88d"
-          firebase deploy --only hosting:$HOSTING_SITE --project "$FIREBASE_PROJECT_ID" --non-interactive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Authenticate to Google (service account JSON secret)
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SNAGGLE_ED88D }}
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools
+      - name: Deploy to Firebase Hosting
+        run: firebase deploy --only hosting --project snaggle-ed88d --non-interactive
