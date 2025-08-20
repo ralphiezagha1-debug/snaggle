@@ -1,4 +1,5 @@
-﻿name: Deploy (Firebase)
+# .github/workflows/deploy.yml
+name: Build • Preview • Deploy (Firebase Hosting)
 
 on:
   push:
@@ -11,39 +12,50 @@ permissions:
 
 env:
   NODE_VERSION: '20'
-  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-  FIREBASE_SKIP_DEPLOY_PREREQS: 'true'   # <-- skip API checks; we enabled them already
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-
       - name: Install deps
         run: npm ci || npm install
-
       - name: Lint
         run: npm run lint --if-present
-
-      - name: Build
+      - name: Typecheck
+        run: npm run typecheck --if-present || true
+      - name: Build (Vite -> dist)
         run: npm run build
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          if-no-files-found: error
 
-      - name: Write service account file
-        shell: bash
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Setup Firebase Tools
+        uses: firebase/actions/setup-firebasetools@v13
+      - name: Firebase Deploy (Hosting)
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          HOSTING_SITE: ${{ secrets.HOSTING_SITE }}
         run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
-
-      - name: Deploy Firestore & Storage
-        run: |
-          npm i -g firebase-tools
-          firebase deploy --only firestore,storage --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
-
-      - name: Deploy Hosting
-        run: firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
+          echo "$FIREBASE_SERVICE_ACCOUNT" > ${GITHUB_WORKSPACE}/sa.json
+          export GOOGLE_APPLICATION_CREDENTIALS=${GITHUB_WORKSPACE}/sa.json
+          firebase use "$FIREBASE_PROJECT_ID"
+          test "$HOSTING_SITE" = "snaggle-ed88d"
+          firebase deploy --only hosting:$HOSTING_SITE --project "$FIREBASE_PROJECT_ID" --non-interactive

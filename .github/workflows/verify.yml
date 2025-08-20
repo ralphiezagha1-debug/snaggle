@@ -1,0 +1,38 @@
+name: Verify Config
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Firebase & GitHub CLI
+        run: |
+          npm i -g firebase-tools
+          sudo apt-get update -y
+          sudo apt-get install -y gh
+
+      - name: Verify Firebase Project and Hosting Site
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          HOSTING_SITE: ${{ secrets.HOSTING_SITE }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          echo "Checking Firebase CLI version..."
+          firebase --version
+          echo "Checking project: $FIREBASE_PROJECT_ID"
+          firebase projects:list | grep $FIREBASE_PROJECT_ID || (echo "Project not found" && exit 1)
+          echo "Checking hosting site: $HOSTING_SITE"
+          firebase hosting:sites:list --project $FIREBASE_PROJECT_ID | grep $HOSTING_SITE || (echo "Hosting site not found" && exit 1)
+          echo "✅ Verification complete: project and hosting site match secrets"
