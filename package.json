@@ -19,6 +19,8 @@
     "postcss": "8.5.6",
     "pptxgenjs": "4.0.0",
     "prismjs": "1.30.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "sharp": "0.34.1",
     "tailwindcss": "4.1.10",
     "ts-node": "10.9.2",
@@ -32,6 +34,8 @@
     "clean": "rimraf dist"
   },
   "devDependencies": {
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^4.7.0",
     "rimraf": "^6.0.1",
     "vite": "^6.3.5"
