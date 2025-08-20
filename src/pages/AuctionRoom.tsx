@@ -344,7 +344,7 @@ const AuctionRoom = () => {
 
         {/* Bid History */}
         <div className="mt-8">
-          <BidHistory bids={bids} currentUserId="current-user" />
+          <BidHistory bids={(bids as any)} currentUserId="current-user" />
         </div>
       </div>
     </div>
@@ -352,3 +352,4 @@ const AuctionRoom = () => {
 };
 
 export default AuctionRoom;
+

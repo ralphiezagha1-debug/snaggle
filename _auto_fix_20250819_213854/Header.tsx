@@ -9,7 +9,7 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Wallet, Gavel, User, LogOut, CreditCard, Trophy, Settings } from 'lucide-react';
+import { Wallet, Gavel, _User, LogOut, CreditCard, Trophy, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -68,7 +68,7 @@ export const Header = ({ userCredits = 0, userName = "Guest", isAuthenticated = 
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* User Actions */}
+        {/* _User Actions */}
         <div className="flex items-center gap-4">
           {/* Credits Display */}
           {isAuthenticated && (
@@ -79,7 +79,7 @@ export const Header = ({ userCredits = 0, userName = "Guest", isAuthenticated = 
             </div>
           )}
 
-          {/* User Menu */}
+          {/* _User Menu */}
           {isAuthenticated ? (
             <NavigationMenu>
               <NavigationMenuList>
@@ -150,6 +150,5 @@ export const Header = ({ userCredits = 0, userName = "Guest", isAuthenticated = 
     </header>
   );
 };
-
 
 
