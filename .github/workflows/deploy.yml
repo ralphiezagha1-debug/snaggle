@@ -32,6 +32,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    env:
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,25 +45,38 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Fail fast if required secrets are missing
+      # Fail fast if required secrets are missing or wrong
       - name: Validate secrets
         run: |
           if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
             echo "::error::Missing FIREBASE_SERVICE_ACCOUNT secret"; exit 1; fi
           if [ -z "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
             echo "::error::Missing FIREBASE_PROJECT_ID secret"; exit 1; fi
+          if [ "${{ secrets.FIREBASE_PROJECT_ID }}" != "snaggle-ed88d" ]; then
+            echo "::warning::FIREBASE_PROJECT_ID is '${{ secrets.FIREBASE_PROJECT_ID }}' (expected 'snaggle-ed88d')"; fi
 
-      # Deploy to LIVE channel on your Firebase project
-      - name: Deploy to Firebase Hosting (live)
-        uses: FirebaseExtended/action-hosting-deploy@v0
+      # Authenticate to Google using your Service Account JSON secret
+      - name: Auth to Google
+        uses: google-github-actions/auth@v2
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
-          channelId: live
+          # This must be the FULL JSON from Firebase Console > Service accounts > Generate new private key
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
-      # Basic smoke check that the site is up
-      - name: Smoke check
+      # Install Firebase CLI and verify access to the project
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools@latest
+      - name: Verify project access
+        run: |
+          firebase --version
+          firebase projects:list --project "$FIREBASE_PROJECT_ID" || { echo "::error::Service account cannot access project $FIREBASE_PROJECT_ID"; exit 1; }
+
+      # Deploy to LIVE
+      - name: Deploy to Firebase Hosting (live)
+        run: |
+          firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" --non-interactive --force
+
+      # Smoke check
+      - name: Smoke check (snaggle.fun)
         run: |
           code=$(curl -s -o /dev/null -w "%{http_code}" "https://snaggle.fun/?v=$(date +%s)")
           echo "HTTP $code"
