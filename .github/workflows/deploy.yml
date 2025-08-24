@@ -4,9 +4,34 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
 jobs:
-  build_deploy:
+  verify:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install deps
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,14 +42,25 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Install Firebase CLI
-        run: npm i -g firebase-tools@latest
-      - name: Auth to Google
-        uses: google-github-actions/auth@v2
+
+      # Fail fast if required secrets are missing
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
+            echo "::error::Missing FIREBASE_SERVICE_ACCOUNT secret"; exit 1; fi
+          if [ -z "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
+            echo "::error::Missing FIREBASE_PROJECT_ID secret"; exit 1; fi
+
+      # Deploy to LIVE channel on your Firebase project
+      - name: Deploy to Firebase Hosting (live)
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      - name: Deploy to Hosting
-        run: firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }} --non-interactive --force
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          channelId: live
+
+      # Basic smoke check that the site is up
       - name: Smoke check
         run: |
           code=$(curl -s -o /dev/null -w "%{http_code}" "https://snaggle.fun/?v=$(date +%s)")
