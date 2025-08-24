@@ -1,35 +1,90 @@
-name: Deploy to Firebase
-
+name: verify-and-deploy
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
+          node-version: 20
+          cache: npm
+      - name: Install deps
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
         run: npm run build
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install deps
+        run: npm ci
+      - name: Build
+        run: npm run build
 
-      - name: Deploy to Firebase
+      # Fail fast with clear messages if secrets are missing/wrong
+      - name: Validate secrets
         run: |
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > ./firebase-service-account.json
-          firebase deploy --only hosting,functions --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ./firebase-service-account.json
+          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
+            echo "::error:: Missing FIREBASE_SERVICE_ACCOUNT secret (paste full JSON key)"; exit 1; fi
+          if [ -z "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
+            echo "::error:: Missing FIREBASE_PROJECT_ID secret (should be 'snaggle-ed88d')"; exit 1; fi
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' | jq -e .project_id >/dev/null 2>&1 || { echo "::error:: FIREBASE_SERVICE_ACCOUNT is not valid JSON"; exit 1; }
+          SA_PROJ=$(echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' | jq -r .project_id)
+          echo "Service account project_id: $SA_PROJ"
+          echo "Workflow project_id: $FIREBASE_PROJECT_ID"
+          if [ "$SA_PROJ" != "$FIREBASE_PROJECT_ID" ]; then
+            echo "::warning:: Service account JSON is for '$SA_PROJ' but FIREBASE_PROJECT_ID is '$FIREBASE_PROJECT_ID'"
+          fi
+
+      - name: Authenticate to Google (service account)
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          export_default_credentials: true
+
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools@latest
+
+      - name: Verify project access
+        run: |
+          firebase --version
+          firebase projects:list --project "$FIREBASE_PROJECT_ID" || { echo "::error:: Service account cannot access project $FIREBASE_PROJECT_ID"; exit 1; }
+
+      - name: Deploy to Firebase Hosting (live)
+        run: |
+          firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" --non-interactive --force --debug
+
+      - name: Smoke check (snaggle.fun)
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://snaggle.fun/?v=$(date +%s)")
+          echo "HTTP $code"
+          test "$code" = "200"
+
+      - name: Print Hosting release info
+        run: |
+          echo "---- Latest hosting releases ----"
+          firebase hosting:releases --project "$FIREBASE_PROJECT_ID" --limit 5 || true
