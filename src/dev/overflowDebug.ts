@@ -5,6 +5,5 @@ export function logOverflowingNodes() {
     const r = el.getBoundingClientRect();
     if (r.right - vw > 1) bad.push(el);
   });
-  // eslint-disable-next-line no-console
   console.log("Overflowing nodes:", bad);
 }
