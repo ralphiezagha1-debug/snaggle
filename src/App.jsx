@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import AuctionCatalog from "./pages/AuctionCatalog";
 import AuctionDetail from "./pages/AuctionDetail";
 import Credits from "./pages/Credits";
+import SignIn from "./pages/SignIn";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
             <Route path="/auctions" element={<AuctionCatalog />} />
             <Route path="/auctions/:id" element={<AuctionDetail />} />
             <Route path="/credits" element={<Credits />} />
+            <Route path="/signin" element={<SignIn />} />
           </Routes>
         </main>
         <Footer />
