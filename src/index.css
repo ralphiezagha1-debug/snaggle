@@ -1,3 +1,10 @@
+html, body, #root {
+  overflow-x: hidden;
+}
+.container, .page-wrap, .app-shell {
+  max-width: 100vw;
+}
+
 /* A basic CSS reset */
 * {
   margin: 0;

@@ -2,12 +2,16 @@ import { Button } from "@/components/ui/button";
 import { useCredits } from "../state/credits";
 
 export default function Credits() {
-  const { balance } = useCredits();
+  const { credits, setCredits, refresh } = useCredits();
 
   return (
     <div>
       <h1 className="text-3xl font-bold">Buy Credits</h1>
-      <p className="text-xl mt-4">Your current balance is: <span className="font-bold">{balance} credits</span></p>
+      <p className="text-xl mt-4">Your current balance is: <span className="font-bold">{credits} credits</span></p>
+      <div className="mt-8 space-x-4">
+        <Button onClick={() => setCredits(credits + 10)}>+10 test credits</Button>
+        <Button onClick={refresh}>Refresh</Button>
+      </div>
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="border p-8 rounded-lg text-center">
           <h2 className="text-2xl font-bold">50 Credits</h2>

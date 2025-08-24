@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,9 @@ export default function SignIn() {
       <Button onClick={handleGoogleSignIn} className="w-full mt-4">
         Continue with Google
       </Button>
+      <div className="mt-4 text-center">
+        <Link to="/forgot-password">Forgot password?</Link>
+      </div>
     </div>
   );
 }

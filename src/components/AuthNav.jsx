@@ -25,14 +25,18 @@ export default function AuthNav() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Avatar>
           <AvatarImage src={user.photoURL} />
           <AvatarFallback>{user.displayName?.[0] || user.email?.[0]}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent align="end" collisionPadding={16} className="max-w-[calc(100vw-1rem)]">
         <DropdownMenuLabel>{user.displayName || user.email}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <Link to="/account">
+          <DropdownMenuItem>Account</DropdownMenuItem>
+        </Link>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => auth.signOut()}>Sign Out</DropdownMenuItem>
       </DropdownMenuContent>
