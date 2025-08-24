@@ -15,11 +15,11 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signInWithEmail: (email: string, password: string) => Promise<any>;
-  signUpWithEmail: (email: string, password: string) => Promise<any>;
-  signInWithGoogle: () => Promise<any>;
-  sendPasswordReset: (email: string) => Promise<any>;
-  signOut: () => Promise<any>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  sendPasswordReset: (email: string) => Promise<void>;
+  signOut: () => Promise<void>;
   updateProfile: (data: { displayName?: string; photoURL?: string }) => Promise<void>;
 }
 
@@ -55,11 +55,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const signInWithEmail = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
-  const signUpWithEmail = (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password);
-  const signInWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
-  const sendPasswordReset = (email: string) => sendPasswordResetEmail(auth, email);
-  const signOut = () => auth.signOut();
+  const signInWithEmail = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email, password);
+  };
+  const signUpWithEmail = async (email: string, password: string, displayName?: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    if (displayName) {
+      await firebaseUpdateProfile(userCredential.user, { displayName });
+    }
+  };
+  const signInWithGoogle = async () => {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  };
+  const sendPasswordReset = async (email: string) => {
+    await sendPasswordResetEmail(auth, email);
+  };
+  const signOut = async () => {
+    await auth.signOut();
+  };
   const updateProfile = async (data: { displayName?: string; photoURL?: string }) => {
     if (user) {
       await firebaseUpdateProfile(user, data);
