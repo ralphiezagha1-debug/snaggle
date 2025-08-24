@@ -1,63 +1,32 @@
-﻿name: verify-and-deploy
+name: verify-and-deploy
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-concurrency:
-  group: deploy-main
-  cancel-in-progress: true
-
 jobs:
   build_deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    env:
-      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }} # -> "snaggle-ed88d"
-      FIREBASE_SITE_ID: ${{ secrets.HOSTING_SITE }}            # optional; ok if empty
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Auth to Google Cloud (service account JSON)
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install deps
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools@latest
+      - name: Auth to Google
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install deps
-        run: npm ci
-
-      - name: Build (Vite)
-        run: npm run build
-
-      - name: Install Firebase CLI + jq
+      - name: Deploy to Hosting
+        run: firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }} --non-interactive --force
+      - name: Smoke check
         run: |
-          npm i -g firebase-tools@latest
-          sudo apt-get update -y && sudo apt-get install -y jq
-
-      - name: Verify access (fail fast if project id is wrong)
-        run: |
-          echo "Firebase CLI:" && firebase --version
-          echo "Checking project: $FIREBASE_PROJECT_ID"
-          firebase projects:list --json | jq -r '.result[]?.projectId' | grep -Fx "$FIREBASE_PROJECT_ID"
-          echo "Hosting sites for $FIREBASE_PROJECT_ID:"
-          firebase hosting:sites:list --project "$FIREBASE_PROJECT_ID"
-
-      - name: Deploy to Firebase Hosting
-        run: |
-          if [ -n "$FIREBASE_SITE_ID" ]; then
-            echo "Deploying to site: $FIREBASE_SITE_ID"
-            firebase deploy --only hosting:$FIREBASE_SITE_ID --project "$FIREBASE_PROJECT_ID" --non-interactive --force
-          else
-            echo "Deploying to default hosting site (from firebase.json)"
-            firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" --non-interactive --force
-          fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://snaggle.fun/?v=$(date +%s)")
+          echo "HTTP $code"
+          test "$code" = "200"

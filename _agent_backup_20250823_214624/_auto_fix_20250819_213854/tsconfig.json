@@ -1,0 +1,13 @@
+﻿{
+    "compilerOptions":  {
+                            "strict":  true,
+                            "skipLibCheck":  true,
+                            "jsx":  "react-jsx",
+                            "module": "ESNext","moduleResolution":  "bundler"
+                        },
+    "exclude":  [
+                    "_backup_ui_*",
+                    "__archive_backup_ui__"
+                ]
+}
+
