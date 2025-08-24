@@ -1,7 +1,7 @@
 // This page displays a simple placeholder message while Snaggle is under construction.
 // As the product is developed the content here can be replaced with actual UI.
 
-export default function Home() {
+export default function App() {
   // Render a centered heading indicating that the site is live.
   return (
     <div
