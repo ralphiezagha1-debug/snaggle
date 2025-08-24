@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { CreditsDisplay } from "./CreditsDisplay";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -23,8 +24,8 @@ export default function Navbar() {
           <Link to="/faq" className="text-gray-700 hover:text-blue-500">FAQ</Link>
           <Link to="/about" className="text-gray-700 hover:text-blue-500">About</Link>
           <Link to="/contact" className="text-gray-700 hover:text-blue-500">Contact</Link>
-          <div className="flex items-center space-x-2">
-            <Badge variant="secondary">75 credits</Badge>
+          <div className="flex items-center space-x-4">
+            <CreditsDisplay />
             <DropdownMenu>
               <DropdownMenuTrigger>Profile</DropdownMenuTrigger>
               <DropdownMenuContent>
