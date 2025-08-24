@@ -21,7 +21,7 @@ export default function App() {
         <div className="sticky top-0 z-40 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b">
           <Navbar />
         </div>
-        <main className="flex-grow container mx-auto px-4 py-8">
+        <main className="flex-grow mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/auctions" element={<AuctionCatalog />} />

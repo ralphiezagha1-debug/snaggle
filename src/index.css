@@ -1,24 +1,15 @@
-/* === VISUAL QUICK WINS: overflow + layout sanity === */
-html, body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
+/* 1) Basic box model */
 *, *::before, *::after { box-sizing: border-box; }
 
-/* Optional clamps if something grows too wide */
-.__clamp { max-width: min(100vw, 1280px); overflow: hidden; }
-
-/* Dropdown / popover safety net so it never forces scroll */
-.__menu-surface { max-width: 90vw; right: 0; margin-right: .5rem; }
-
+/* 2) Guard rails for X overflow */
 html, body, #root {
-  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip; /* clip prevents scrollbars without impacting Y */
 }
-.container, .page-wrap, .app-shell {
-  max-width: 100vw;
-}
+
+/* 3) Flex shrink safety (prevents children from forcing width) */
+:root, body, #root { min-width: 0; }
 
 /* A basic CSS reset */
 * {

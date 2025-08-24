@@ -24,8 +24,9 @@ export default function AuthNav() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <div className="relative ml-auto min-w-0">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
         <Avatar>
           <AvatarImage src={user.photoURL} />
           <AvatarFallback>{user.displayName?.[0] || user.email?.[0]}</AvatarFallback>
@@ -41,5 +42,6 @@ export default function AuthNav() {
         <DropdownMenuItem onSelect={() => auth.signOut()}>Sign Out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  </div>
   );
 }
