@@ -1,14 +1,29 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  User,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  sendPasswordResetEmail,
+  updateProfile as firebaseUpdateProfile,
+} from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  signInWithEmail: (email: string, password: string) => Promise<any>;
+  signUpWithEmail: (email: string, password: string) => Promise<any>;
+  signInWithGoogle: () => Promise<any>;
+  sendPasswordReset: (email: string) => Promise<any>;
+  signOut: () => Promise<any>;
+  updateProfile: (data: { displayName?: string; photoURL?: string }) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -40,7 +55,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const value = { user, loading };
+  const signInWithEmail = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
+  const signUpWithEmail = (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password);
+  const signInWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
+  const sendPasswordReset = (email: string) => sendPasswordResetEmail(auth, email);
+  const signOut = () => auth.signOut();
+  const updateProfile = async (data: { displayName?: string; photoURL?: string }) => {
+    if (user) {
+      await firebaseUpdateProfile(user, data);
+    }
+  };
+
+  const value = { user, loading, signInWithEmail, signUpWithEmail, signInWithGoogle, sendPasswordReset, signOut, updateProfile };
 
   return (
     <AuthContext.Provider value={value}>
@@ -50,5 +76,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

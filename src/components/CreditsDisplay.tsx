@@ -1,13 +1,17 @@
 import { useCredits } from '../state/credits';
-import { Badge } from '@/components/ui/badge';
 
 export const CreditsDisplay = () => {
-  const { credits } = useCredits();
+  const { credits, loading } = useCredits();
+
+  if (loading) {
+    return null;
+  }
 
   return (
-    <div className="flex items-center space-x-2">
-      <span>Credits:</span>
-      <Badge data-credits={credits}>{credits}</Badge>
+    <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 shadow-sm">
+      <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" />
+      <span className="text-sm font-medium">Credits</span>
+      <span className="text-sm tabular-nums" data-credits={credits}>{credits}</span>
     </div>
   );
 };

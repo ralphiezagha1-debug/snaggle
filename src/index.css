@@ -1,3 +1,18 @@
+/* === VISUAL QUICK WINS: overflow + layout sanity === */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Optional clamps if something grows too wide */
+.__clamp { max-width: min(100vw, 1280px); overflow: hidden; }
+
+/* Dropdown / popover safety net so it never forces scroll */
+.__menu-surface { max-width: 90vw; right: 0; margin-right: .5rem; }
+
 html, body, #root {
   overflow-x: hidden;
 }

@@ -1,17 +1,13 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../state/auth';
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../state/auth";
 
-export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+export default function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
+  if (loading) return null; // or a spinner/skeleton
   if (!user) {
-    return <Navigate to={`/signin?next=${location.pathname}`} replace />;
+    return <Navigate to="/signin" replace state={{ from: location.pathname }} />;
   }
-
-  return children;
-};
+  return <>{children}</>;
+}

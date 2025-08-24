@@ -1,20 +1,26 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import AnnouncementBar from "./components/AnnouncementBar";
+import SiteFooter from "./components/SiteFooter";
 import Home from "./pages/Home";
 import AuctionCatalog from "./pages/AuctionCatalog";
 import AuctionDetail from "./pages/AuctionDetail";
 import Credits from "./pages/Credits";
-import SignIn from "./pages/SignIn";
+import SignIn from "./pages/auth/SignIn";
+import SignUp from "./pages/auth/SignUp";
+import ResetPassword from "./pages/auth/ResetPassword";
 import Account from "./pages/Account";
-import ForgotPassword from "./pages/ForgotPassword";
-import { ProtectedRoute } from "./routes/ProtectedRoute";
+import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
-        <Navbar />
+        <AnnouncementBar />
+        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b">
+          <Navbar />
+        </div>
         <main className="flex-grow container mx-auto px-4 py-8">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -22,11 +28,13 @@ export default function App() {
             <Route path="/auctions/:id" element={<AuctionDetail />} />
             <Route path="/credits" element={<Credits />} />
             <Route path="/signin" element={<SignIn />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/reset" element={<ResetPassword />} />
             <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
-        <Footer />
+        <SiteFooter />
       </div>
     </Router>
   );
