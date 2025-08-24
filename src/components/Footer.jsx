@@ -1,10 +1,9 @@
-"use client";
-
 export default function Footer() {
-  const year = new Date().getFullYear();
   return (
-    <footer className="bg-gray-100 text-center py-4 mt-8">
-      <p className="text-gray-500 text-sm">&copy; {year} Snaggle. All rights reserved.</p>
+    <footer className="bg-white shadow-md mt-8">
+      <div className="container mx-auto px-4 py-4 text-center text-gray-700">
+        &copy; 2025 Snaggle. All rights reserved.
+      </div>
     </footer>
   );
 }

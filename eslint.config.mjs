@@ -17,4 +17,7 @@ export default tseslint.config(
       "react/prop-types": "off",
     },
   },
+  {
+    ignores: ["dist", "node_modules", ".next", "out", "*.js", "*.mjs", "src/firebase.js"],
+  }
 );

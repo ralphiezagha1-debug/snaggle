@@ -1,19 +1,26 @@
-// This page displays a simple placeholder message while Snaggle is under construction.
-// As the product is developed the content here can be replaced with actual UI.
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import AuctionCatalog from "./pages/AuctionCatalog";
+import AuctionDetail from "./pages/AuctionDetail";
+import Credits from "./pages/Credits";
 
 export default function App() {
-  // Render a centered heading indicating that the site is live.
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        width: "100%",
-      }}
-    >
-      <h1 style={{ fontSize: "2.5rem", fontWeight: 600 }}>Snaggle is Live</h1>
-    </div>
+    <Router>
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow container mx-auto px-4 py-8">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/auctions" element={<AuctionCatalog />} />
+            <Route path="/auctions/:id" element={<AuctionDetail />} />
+            <Route path="/credits" element={<Credits />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
 }

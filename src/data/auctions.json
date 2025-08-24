@@ -1,0 +1,74 @@
+[
+  {
+    "id": "1",
+    "title": "Vintage Leather Jacket",
+    "img": "https://picsum.photos/seed/1/400/300",
+    "msrp": 250,
+    "currentPrice": 12.50,
+    "endsAt": "2025-09-15T12:00:00Z",
+    "status": "live"
+  },
+  {
+    "id": "2",
+    "title": "Antique Pocket Watch",
+    "img": "https://picsum.photos/seed/2/400/300",
+    "msrp": 500,
+    "currentPrice": 25.00,
+    "endsAt": "2025-09-16T12:00:00Z",
+    "status": "live"
+  },
+  {
+    "id": "3",
+    "title": "Signed Baseball",
+    "img": "https://picsum.photos/seed/3/400/300",
+    "msrp": 100,
+    "currentPrice": 5.00,
+    "endsAt": "2025-09-17T12:00:00Z",
+    "status": "live"
+  },
+  {
+    "id": "4",
+    "title": "First Edition Book",
+    "img": "https://picsum.photos/seed/4/400/300",
+    "msrp": 300,
+    "currentPrice": 15.00,
+    "endsAt": "2025-09-18T12:00:00Z",
+    "status": "live"
+  },
+  {
+    "id": "5",
+    "title": "Electric Guitar",
+    "img": "https://picsum.photos/seed/5/400/300",
+    "msrp": 800,
+    "currentPrice": 40.00,
+    "endsAt": "2025-09-19T12:00:00Z",
+    "status": "live"
+  },
+  {
+    "id": "6",
+    "title": "Designer Handbag",
+    "img": "https://picsum.photos/seed/6/400/300",
+    "msrp": 1200,
+    "currentPrice": 60.00,
+    "endsAt": "2025-09-20T12:00:00Z",
+    "status": "scheduled"
+  },
+  {
+    "id": "7",
+    "title": "Diamond Necklace",
+    "img": "https://picsum.photos/seed/7/400/300",
+    "msrp": 2500,
+    "currentPrice": 125.00,
+    "endsAt": "2025-09-21T12:00:00Z",
+    "status": "scheduled"
+  },
+  {
+    "id": "8",
+    "title": "Vintage Record Player",
+    "img": "https://picsum.photos/seed/8/400/300",
+    "msrp": 400,
+    "currentPrice": 20.00,
+    "endsAt": "2025-08-01T12:00:00Z",
+    "status": "ended"
+  }
+]

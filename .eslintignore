@@ -1,0 +1,7 @@
+/dist
+/node_modules
+/.next
+/out
+/*.js
+/*.mjs
+/src/firebase.js
