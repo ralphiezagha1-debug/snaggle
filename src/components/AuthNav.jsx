@@ -9,6 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuPortal,
 } from "./ui/dropdown-menu";
 import { auth } from "../lib/firebase";
 
@@ -32,15 +33,23 @@ export default function AuthNav() {
           <AvatarFallback>{user.displayName?.[0] || user.email?.[0]}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" collisionPadding={16} className="max-w-[calc(100vw-1rem)]">
-        <DropdownMenuLabel>{user.displayName || user.email}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <Link to="/account">
-          <DropdownMenuItem>Account</DropdownMenuItem>
-        </Link>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => auth.signOut()}>Sign Out</DropdownMenuItem>
-      </DropdownMenuContent>
+      <DropdownMenuPortal>
+        <DropdownMenuContent
+          align="end"
+          sideOffset={8}
+          collisionPadding={8}
+          avoidCollisions
+          className="w-56 max-w-[calc(100vw-1rem)] sm:max-w-[18rem] overflow-hidden"
+        >
+          <DropdownMenuLabel>{user.displayName || user.email}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <Link to="/account">
+            <DropdownMenuItem>Account</DropdownMenuItem>
+          </Link>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => auth.signOut()}>Sign Out</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
     </DropdownMenu>
   </div>
   );

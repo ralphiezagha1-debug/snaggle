@@ -5,7 +5,19 @@
 html, body, #root {
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   overflow-x: clip; /* clip prevents scrollbars without impacting Y */
+}
+
+/* Radix / shadcn portals: keep within viewport and avoid affecting layout */
+[data-radix-dropdown-menu-content],
+[data-radix-popover-content],
+[data-radix-dialog-content],
+[data-radix-hover-card-content],
+[data-radix-select-content] {
+  max-width: calc(100vw - 0.75rem);
+  contain: layout paint size;
+  overscroll-behavior: contain;
 }
 
 /* 3) Flex shrink safety (prevents children from forcing width) */
