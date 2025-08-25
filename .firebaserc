@@ -1,15 +1,5 @@
 {
   "projects": {
     "default": "snaggle-ed88d"
-  },
-  "targets": {
-    "snaggle-ed88d": {
-      "hosting": {
-        "snaggle-ed88d": [
-          "snaggle-ed88d"
-        ]
-      }
-    }
-  },
-  "etags": {}
+  }
 }
