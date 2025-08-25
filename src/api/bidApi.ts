@@ -13,7 +13,7 @@ export interface BidApi {
   // Bids
   getRecentBids(auctionId: string, limit?: number): Promise<Bid[]>;
   watchRecentBids(auctionId: string, limit: number, cb: (bids: Bid[]) => void): Unsubscribe;
-  placeBid(auctionId: string): Promise<{ ok: true }>();
+  placeBid(auctionId: string): Promise<{ ok: true }>;
 
   // Credits
   getCredits(uid: string): Promise<UserCredits | null>;
