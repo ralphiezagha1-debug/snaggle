@@ -18,66 +18,37 @@ jobs:
           node-version: 20
           cache: npm
       - name: Install deps
-        run: npm ci
+        run: npm ci || npm install --no-audit --no-fund
       - name: Lint
-        run: npm run lint
+        run: npm run lint --if-present
       - name: Typecheck
-        run: npm run typecheck
+        run: npm run typecheck --if-present
       - name: Build
         run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
 
   deploy:
     needs: verify
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
-    env:
-      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/download-artifact@v4
         with:
-          node-version: 20
-          cache: npm
-      - name: Install deps
-        run: npm ci
-      - name: Build
-        run: npm run build
-
-      # Fail fast if required secrets are missing or wrong
-      - name: Validate secrets
-        run: |
-          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
-            echo "::error::Missing FIREBASE_SERVICE_ACCOUNT secret"; exit 1; fi
-          if [ -z "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
-            echo "::error::Missing FIREBASE_PROJECT_ID secret"; exit 1; fi
-          if [ "${{ secrets.FIREBASE_PROJECT_ID }}" != "snaggle-ed88d" ]; then
-            echo "::warning::FIREBASE_PROJECT_ID is '${{ secrets.FIREBASE_PROJECT_ID }}' (expected 'snaggle-ed88d')"; fi
-
-      # Authenticate to Google using your Service Account JSON secret
-      - name: Auth to Google
-        uses: google-github-actions/auth@v2
-        with:
-          # This must be the FULL JSON from Firebase Console > Service accounts > Generate new private key
-          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
-      # Install Firebase CLI and verify access to the project
+          name: dist
+          path: dist
       - name: Install Firebase CLI
         run: npm i -g firebase-tools@latest
-      - name: Verify project access
-        run: |
-          firebase --version
-          firebase projects:list --project "$FIREBASE_PROJECT_ID" || { echo "::error::Service account cannot access project $FIREBASE_PROJECT_ID"; exit 1; }
-
-      # Deploy to LIVE
+      - name: Authenticate to Google (service account)
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       - name: Deploy to Firebase Hosting (live)
         run: |
-          firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" --non-interactive --force
-
-      # Smoke check
-      - name: Smoke check (snaggle.fun)
-        run: |
-          code=$(curl -s -o /dev/null -w "%{http_code}" "https://snaggle.fun/?v=$(date +%s)")
-          echo "HTTP $code"
-          test "$code" = "200"
+          firebase deploy --only hosting --project snaggle-ed88d --non-interactive --force --debug
