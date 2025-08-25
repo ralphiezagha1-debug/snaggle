@@ -1,10 +1,11 @@
 import { useCredits } from '../state/credits';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const CreditsDisplay = () => {
   const { credits, loading } = useCredits();
 
   if (loading) {
-    return null;
+    return <Skeleton className="h-8 w-24" />;
   }
 
   return (
