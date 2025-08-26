@@ -7,8 +7,9 @@ on:
         required: true
         default: main
       branches:
-        description: Newline-separated branches to merge (e.g. "fix/main-hardening\nfix/build-and-deployment")
-        required: true
+        description: Newline-separated branches to merge (leave blank to auto-discover)
+        required: false
+        default: ""
 permissions:
   contents: write
   pull-requests: write
@@ -29,20 +30,60 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Create integration branch
+        id: create_integration
+        shell: bash
         run: |
           BR="consolidation/merge-$(date +%Y%m%d-%H%M)"
           echo "BRANCH=$BR" >> $GITHUB_ENV
           git switch -c "$BR"
+          # push now so the branch exists even if later steps fail
+          git push --set-upstream origin "$BR"
 
-      - name: Merge branches (fail on conflicts)
+      - name: Discover branches (if input empty)
+        id: discover
+        shell: bash
+        run: |
+          BASE="${{ inputs.base }}"
+          IGNORE_REGEX='^(origin/'"$BASE"'|origin/gh-pages|origin/consolidation/|origin/backup|origin/tmp|origin/experiment|origin/dependabot/)'
+          git fetch origin --prune
+          mapfile -t REMOTES < <(git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/remotes/origin | grep -vE "$IGNORE_REGEX")
+          LIST=""
+          for br in "${REMOTES[@]}"; do
+            name="${br#origin/}"
+            # ahead of base?
+            ahead=$(git rev-list --left-right --count "origin/$BASE...$br" | awk '{print $2}')
+            if [ "$ahead" -gt 0 ]; then
+              LIST+="$name"$'\n'
+            fi
+          done
+          echo "list<<EOF" >> $GITHUB_OUTPUT
+          printf "%s" "$LIST" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "Auto-discovered branches (ahead of $BASE):"
+          printf "%s" "$LIST"
+
+      - name: Merge branches
+        shell: bash
+        env:
+          INPUT_LIST: ${{ inputs.branches }}
+          DISCOVERED_LIST: ${{ steps.discover.outputs.list }}
         run: |
           set -e
+          LIST="$INPUT_LIST"
+          if [ -z "$LIST" ]; then LIST="$DISCOVERED_LIST"; fi
+          echo "Merging these branches into ${{ env.BRANCH }}:"
+          printf "%s\n" "$LIST"
           while IFS= read -r b; do
             [ -z "$b" ] && continue
-            echo "Merging $b..."
+            echo "::group::Merging $b"
             git fetch origin "$b"
-            git merge --no-ff "origin/$b" -m "Merge branch '$b' into $BRANCH"
-          done <<< "${{ inputs.branches }}"
+            git merge --no-ff "origin/$b" -m "Merge branch '$b' into ${{ env.BRANCH }}" || {
+              echo "::error::Merge conflict with $b. Resolve in a PR or rerun with a subset."
+              exit 1
+            }
+            echo "::endgroup::"
+          done <<< "$LIST"
+          git push
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -60,7 +101,7 @@ jobs:
         run: npm run build
 
       - name: Push integration branch
-        run: git push --set-upstream origin "$BRANCH"
+        run: git push
 
       - name: Open PR to base
         uses: peter-evans/create-pull-request@v6
@@ -71,5 +112,6 @@ jobs:
           title: "Consolidation: merge feature branches into ${{ inputs.base }}"
           body: |
             Auto-created by consolidate-branches workflow.
-            Branches merged:
-            ${{ inputs.branches }}
+
+            Merged branches:
+            ${{ inputs.branches || steps.discover.outputs.list }}
