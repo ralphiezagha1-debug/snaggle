@@ -1,2 +1,0 @@
-﻿origin	https://github.com/ralphiezagha1-debug/snaggle.git (fetch)
-origin	https://github.com/ralphiezagha1-debug/snaggle.git (push)

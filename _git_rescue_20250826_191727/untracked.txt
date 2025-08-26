@@ -1,7 +1,0 @@
-﻿_git_rescue_20250826_191727/branches.txt
-_git_rescue_20250826_191727/head.txt
-_git_rescue_20250826_191727/remotes.txt
-_git_rescue_20250826_191727/staged.diff
-_git_rescue_20250826_191727/status.txt
-_git_rescue_20250826_191727/worktree.diff
-tailwind.config.js
