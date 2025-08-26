@@ -1,11 +1,18 @@
-import * as functions from 'firebase-functions';
-import { getFirestore } from 'firebase-admin/firestore';
+﻿import { onRequest } from "firebase-functions/v2/https";
+import { getFirestore } from "firebase-admin/firestore";
+import { getApps, initializeApp } from "firebase-admin/app";
 
-export const closeAuction = functions.https.onCall(async (data, context) => {
-  if (!context.auth?.uid) throw new functions.https.HttpsError('unauthenticated', 'Sign in required.');
-  const { auctionId } = data as { auctionId: string };
-  if (!auctionId) throw new functions.https.HttpsError('invalid-argument', 'auctionId required.');
-  const db = getFirestore();
-  await db.collection('auctions').doc(auctionId).set({ status: 'closed', updatedAt: Date.now() }, { merge: true });
-  return { ok: true };
+if (getApps().length === 0) { initializeApp(); }
+
+export const closeAuction = onRequest(async (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  // TODO: implement close logic with Firestore
+  // const db = getFirestore();
+  // ...
+
+  res.status(200).send("ok");
 });
