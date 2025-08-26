@@ -1,0 +1,75 @@
+name: consolidate-branches
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: Base branch to merge into
+        required: true
+        default: main
+      branches:
+        description: Newline-separated branches to merge (e.g. "fix/main-hardening\nfix/build-and-deployment")
+        required: true
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base }}
+          fetch-depth: 0
+
+      - name: Configure Git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create integration branch
+        run: |
+          BR="consolidation/merge-$(date +%Y%m%d-%H%M)"
+          echo "BRANCH=$BR" >> $GITHUB_ENV
+          git switch -c "$BR"
+
+      - name: Merge branches (fail on conflicts)
+        run: |
+          set -e
+          while IFS= read -r b; do
+            [ -z "$b" ] && continue
+            echo "Merging $b..."
+            git fetch origin "$b"
+            git merge --no-ff "origin/$b" -m "Merge branch '$b' into $BRANCH"
+          done <<< "${{ inputs.branches }}"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Push integration branch
+        run: git push --set-upstream origin "$BRANCH"
+
+      - name: Open PR to base
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: ${{ inputs.base }}
+          branch: ${{ env.BRANCH }}
+          title: "Consolidation: merge feature branches into ${{ inputs.base }}"
+          body: |
+            Auto-created by consolidate-branches workflow.
+            Branches merged:
+            ${{ inputs.branches }}
