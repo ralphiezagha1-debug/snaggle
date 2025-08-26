@@ -1,8 +1,8 @@
-import * as functions from 'firebase-functions';
-import type { Request, Response } from 'express';
-export { placeBid } from './placeBid';
-export { closeAuction } from './closeAuction';
+﻿import { onRequest } from "firebase-functions/v2/https";
+import * as express from "express";
 
-export const health = functions.https.onRequest((_req: Request, res: Response) => {
-  res.status(200).send('ok');
-});
+const app = express();
+
+app.get("/health", (_req, res) => res.status(200).send("ok"));
+
+export const http = onRequest(app);
