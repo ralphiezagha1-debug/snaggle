@@ -1,0 +1,8 @@
+﻿  agent-sync-20250823_214624      d6efa88 [origin/agent-sync-20250823_214624] Apply Agent snapshot (20250823_214624)
+  backup/pre-rebase-20250816-2325 1d9a0e8 chore(firebase): point hosting to snaggle-ed88d; update rules/indexes; add CI workflow
+  backup/pre-rebase-20250816-2326 1d9a0e8 chore(firebase): point hosting to snaggle-ed88d; update rules/indexes; add CI workflow
+  chore/backend-rules             4828090 [origin/docs/blueprint-checklist: ahead 1] Firebase: set hosting.site to snaggle-ed88d; CI deploy workflow; ignore cors.json
+  ci-port-main                    d7cf614 [origin/ci-port-main] fix(ci): port CI/CD + Firebase config from orphan branch (file-level import, no dupes)
+* fix/bidapi-syntax               23796ca [origin/fix/bidapi-syntax] fix: remove stray () from BidApi.placeBid signature
+  main                            5c4534c [origin/main] Update deploy.yml
+  pre-rebuild-20250811-2250       6f336f4 Merge pull request #2 from ralphiezagha1-debug/ci-workflow-setup
