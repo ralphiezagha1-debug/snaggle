@@ -97,12 +97,12 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative py-20 px-4 text-center overflow-hidden">
-        <div className="absolute inset-0 gradient-primary opacity-10"></div>
+        <div className="absolute inset-0 bg-primary opacity-10"></div>
         <div className="container mx-auto relative z-10">
           <div className="flex items-center justify-center gap-3 mb-6">
             <Gavel className="w-12 h-12 text-primary" />
             <h1 className="text-5xl md:text-6xl font-bold"
-              dangerouslySetInnerHTML={{ __html: HOME_COPY.headline.replace('Snaggle', '<span class="gradient-primary bg-clip-text text-transparent">Snaggle</span>')}}
+              dangerouslySetInnerHTML={{ __html: HOME_COPY.headline.replace('Snaggle', '<span class="text-primary">Snaggle</span>')}}
             />
           </div>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -110,11 +110,11 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button size="lg" className="gradient-primary shadow-glow text-lg px-8">
+            <Button size="lg" className="text-lg px-8 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
               <Zap className="w-5 h-5 mr-2" />
               {HOME_COPY.ctaPrimary}
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8">
+            <Button size="lg" variant="outline" className="text-lg px-8 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
               <Clock className="w-5 h-5 mr-2" />
               {HOME_COPY.ctaSecondary}
             </Button>
@@ -125,12 +125,10 @@ const Index = () => {
             {HOME_COPY.stats.map((stat, index) => (
               <Card className="text-center" key={index}>
                 <CardHeader>
-                  {index === 0 && <Trophy className="w-8 h-8 text-auction-gold mx-auto mb-2" />}
+                  {index === 0 && <Trophy className="w-8 h-8 text-primary mx-auto mb-2" />}
                   {index === 1 && <Users className="w-8 h-8 text-primary mx-auto mb-2" />}
-                  {index === 2 && <Star className="w-8 h-8 text-auction-success mx-auto mb-2" />}
-                  <CardTitle className={`text-2xl font-bold ${
-                    index === 0 ? 'text-auction-gold' : index === 1 ? 'text-primary' : 'text-auction-success'
-                  }`}>{stat.value}</CardTitle>
+                  {index === 2 && <Star className="w-8 h-8 text-primary mx-auto mb-2" />}
+                  <CardTitle className="text-2xl font-bold text-primary">{stat.value}</CardTitle>
                   <p className="text-muted-foreground">{stat.label}</p>
                 </CardHeader>
               </Card>
@@ -228,8 +226,8 @@ const Index = () => {
             
             <Card>
               <CardHeader className="text-center">
-                <div className="w-12 h-12 bg-auction-gold rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-auction-gold-foreground font-bold text-xl">2</span>
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-primary-foreground font-bold text-xl">2</span>
                 </div>
                 <CardTitle>Place Your Bids</CardTitle>
               </CardHeader>
@@ -242,7 +240,7 @@ const Index = () => {
             
             <Card>
               <CardHeader className="text-center">
-                <div className="w-12 h-12 bg-auction-success rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-primary-foreground font-bold text-xl">3</span>
                 </div>
                 <CardTitle>Win & Save</CardTitle>
@@ -256,7 +254,7 @@ const Index = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Button size="lg" className="gradient-primary shadow-glow">
+            <Button size="lg">
               <Zap className="w-5 h-5 mr-2" />
               Get Your First Bid Pack
             </Button>
