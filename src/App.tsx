@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import AuctionRoom from "./pages/AuctionRoom";
 import NotFound from "./pages/NotFound";
+import Credits from "./pages/Credits";
+import MyAuctions from "./pages/MyAuctions";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +20,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auction/:id" element={<AuctionRoom />} />
+          <Route path="/credits" element={<Credits />} />
+          <Route path="/my-auctions" element={<MyAuctions />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

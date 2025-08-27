@@ -25,7 +25,7 @@ export const Header = ({ userCredits = 0, userName = "Guest", isAuthenticated = 
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2">
               <Gavel className="w-8 h-8 text-primary" />
-              <h1 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-primary">
                 Snaggle
               </h1>
             </div>
@@ -46,7 +46,7 @@ export const Header = ({ userCredits = 0, userName = "Guest", isAuthenticated = 
 
                 <NavigationMenuItem>
                   <NavigationMenuLink
-                    href="/wallet"
+                    href="/credits"
                     className={cn(
                       "group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
                     )}
@@ -78,7 +78,7 @@ export const Header = ({ userCredits = 0, userName = "Guest", isAuthenticated = 
                 <Button variant="ghost" size="sm">
                   Sign In
                 </Button>
-                <Button size="sm" className="gradient-primary">
+                <Button size="sm">
                   Get Started
                 </Button>
               </div>
