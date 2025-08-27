@@ -20,16 +20,17 @@ export default {
 		},
 		extend: {
 			colors: {
+				primary:{ DEFAULT:"var(--brand-primary)", "600":"var(--brand-primary-600)", "700":"var(--brand-primary-700)" },
+				accent:"var(--brand-accent)",
+				fg:"var(--brand-fg)",
+				muted:"var(--brand-muted)",
+				bg:"var(--brand-bg)",
 				brand: { DEFAULT: "hsl(var(--brand))", foreground: "hsl(var(--brand-foreground))" },
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
-				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
@@ -37,14 +38,6 @@ export default {
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
-				},
-				muted: {
-					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -73,6 +66,7 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			ringColor:{ DEFAULT:"var(--brand-ring)" },
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',

@@ -18,6 +18,7 @@ export interface BidApi {
   // Credits
   getCredits(uid: string): Promise<UserCredits | null>;
   creditBalance(uid: string, delta: number): Promise<number>;
+  getPurchaseHistory(uid: string): Promise<any[]>; // TODO: Use Purchase model
 
   // Admin-ish
   createAuction(init: Partial<Auction>): Promise<string>;

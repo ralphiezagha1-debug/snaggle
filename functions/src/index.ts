@@ -6,3 +6,7 @@ const app = express();
 app.get("/health", (_req, res) => res.status(200).send("ok"));
 
 export const http = onRequest(app);
+
+export { placeBid } from "./placeBid";
+export { createCheckoutSession } from "./createCheckoutSession";
+export { stripeWebhook } from "./stripeWebhook";

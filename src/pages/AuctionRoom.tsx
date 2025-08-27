@@ -10,89 +10,81 @@ import { Header } from '@/components/layout/Header';
 import { Heart, Share2, Users, Zap, Trophy, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import macbookImage from '@/assets/macbook-hero.jpg';
+import { loadBidApi } from '@/api';
+import type { Auction } from '@/models/Auction';
+import type { Bid } from '@/models/Bid';
+import type { Unsubscribe } from '@/api/bidApi';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import { app } from '@/platforms/firebase/app';
 
-// Mock data - in real app this would come from API
-type AuctionStatus = 'LIVE' | 'SCHEDULED' | 'ENDED';
-
-interface AuctionData {
-  _id: string;
-  title: string;
-  description: string;
-  images: string[];
-  currentPrice: number;
-  msrp: number;
-  endTime: Date;
-  status: AuctionStatus;
-  bidCost: number;
-  participantCount: number;
-  totalBids: number;
-  lastBidder: string;
-  reserveMet: boolean;
-}
-
-const mockAuction: AuctionData = {
-  _id: '1',
-  title: 'MacBook Pro 16" M3 Max - Latest Model',
-  description: 'Brand new MacBook Pro with M3 Max chip, 32GB RAM, 1TB SSD. Perfect for creative professionals and developers.',
-  images: [macbookImage, macbookImage, macbookImage],
-  currentPrice: 47.23,
-  msrp: 399900, // $3999 in cents
-  endTime: new Date(Date.now() + 45000), // 45 seconds from now
-  status: 'LIVE',
-  bidCost: 1,
-  participantCount: 127,
-  totalBids: 2341,
-  lastBidder: 'Alice_2024',
-  reserveMet: true,
-};
-
-const mockBids = [
-  { _id: '1', userId: '1', userName: 'Alice_2024', price: 47.23, timestamp: new Date(Date.now() - 5000), isWinning: true },
-  { _id: '2', userId: '2', userName: 'BidMaster', price: 47.22, timestamp: new Date(Date.now() - 15000) },
-  { _id: '3', userId: '3', userName: 'QuickBidder', price: 47.21, timestamp: new Date(Date.now() - 25000) },
-  { _id: '4', userId: '1', userName: 'Alice_2024', price: 47.20, timestamp: new Date(Date.now() - 35000) },
-  { _id: '5', userId: '4', userName: 'AuctionFan', price: 47.19, timestamp: new Date(Date.now() - 45000) },
-];
 
 const AuctionRoom = () => {
-  const { _id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
-  const [auction, setAuction] = useState(mockAuction);
-  const [bids, setBids] = useState(mockBids);
-  const [userCredits, setUserCredits] = useState(75);
+  const [auction, setAuction] = useState<Auction | null>(null);
+  const [bids, setBids] = useState<Bid[]>([]);
+  const [userCredits, setUserCredits] = useState(0);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isWatchlisted, setIsWatchlisted] = useState(false);
 
-  // Simulate real-time updates
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Randomly add new bids (simulation)
-      if (Math.random() > 0.7) {
-        const newBid = {
-          _id: Date.now().toString(),
-          userId: Math.floor(Math.random() * 5).toString(),
-          userName: ['Alice_2024', 'BidMaster', 'QuickBidder', 'AuctionFan', 'ProBidder'][Math.floor(Math.random() * 5)],
-          price: auction.currentPrice + 0.01,
-          timestamp: new Date(),
-          isWinning: true,
-        };
-
-        setBids(prev => [newBid, ...prev.map(b => ({ ...b, isWinning: false }))]);
-        setAuction(prev => ({
-          ...prev,
-          currentPrice: prev.currentPrice + 0.01,
-          totalBids: prev.totalBids + 1,
-          endTime: new Date(Date.now() + 15000), // Reset to 15 seconds
-          lastBidder: newBid.userName,
-        }));
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      if (user) {
+        const bidApi = await loadBidApi();
+        const credits = await bidApi.getCredits(user.uid);
+        setUserCredits(credits?.balance ?? 0);
+      } else {
+        setUserCredits(0);
       }
-    }, 3000);
+    });
+    return unsubscribe;
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [auction.currentPrice]);
+  useEffect(() => {
+    if (!id) return;
+
+    let auctionUnsubscribe: Unsubscribe | undefined;
+    let bidsUnsubscribe: Unsubscribe | undefined;
+
+    const setupListeners = async () => {
+      const bidApi = await loadBidApi();
+
+      auctionUnsubscribe = bidApi.watchAuction(id, (newAuction) => {
+        setAuction(newAuction);
+      });
+
+      bidsUnsubscribe = bidApi.watchRecentBids(id, 20, (newBids) => {
+        setBids(newBids);
+      });
+    };
+
+    setupListeners();
+
+    return () => {
+      auctionUnsubscribe?.();
+      bidsUnsubscribe?.();
+    };
+  }, [id]);
+
+  if (!auction) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p>Loading auction...</p>
+      </div>
+    );
+  }
 
   const handleBid = async () => {
-    if (userCredits < auction.bidCost) {
+    if (!currentUser) {
+      toast({ title: "Not signed in", description: "You must be signed in to bid.", variant: "destructive" });
+      return;
+    }
+    if (!auction) return;
+
+    if (userCredits < 1) { // Assuming bid cost is 1
       toast({
         title: "Insufficient Credits",
         description: "You don't have enough bid credits. Purchase more to continue bidding.",
@@ -101,40 +93,29 @@ const AuctionRoom = () => {
       return;
     }
 
-    // Simulate bid placement
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const newBid = {
-      _id: Date.now().toString(),
-      userId: 'current-user',
-      userName: 'You',
-      price: auction.currentPrice + 0.01,
-      timestamp: new Date(),
-      isWinning: true,
-    };
-
-    setBids(prev => [newBid, ...prev.map(b => ({ ...b, isWinning: false }))]);
-    setAuction(prev => ({
-      ...prev,
-      currentPrice: prev.currentPrice + 0.01,
-      totalBids: prev.totalBids + 1,
-      endTime: new Date(Date.now() + 15000), // Reset timer
-      lastBidder: 'You',
-    }));
-    setUserCredits(prev => prev - auction.bidCost);
-
-    toast({
-      title: "Bid Placed Successfully!",
-      description: `You're now winning at $${(auction.currentPrice + 0.01).toFixed(2)}`,
-    });
+    try {
+      const bidApi = await loadBidApi();
+      await bidApi.placeBid(auction.id);
+      toast({
+        title: "Bid Placed Successfully!",
+        description: "You are the new highest bidder.",
+      });
+      setUserCredits(prev => prev - 1);
+    } catch (error: any) {
+      toast({
+        title: "Bid Failed",
+        description: error.message || "An unknown error occurred.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleTimeUp = () => {
-    setAuction(prev => ({ ...prev, status: 'ENDED' as AuctionStatus }));
+    setAuction(prev => ({ ...prev!, status: 'closed' }));
     
-    if (auction.lastBidder === 'You') {
+    if (auction.lastBidderId === currentUser?.uid) {
       toast({
-        title: "ðŸŽ‰ Congratulations! You Won!",
+        title: "🎉 Congratulations! You Won!",
         description: `You won the ${auction.title} for $${auction.currentPrice.toFixed(2)}!`,
       });
     } else {
@@ -144,9 +125,6 @@ const AuctionRoom = () => {
       });
     }
   };
-
-  const savings = auction.msrp - (auction.currentPrice * 100);
-  const savingsPercent = Math.round((savings / auction.msrp) * 100);
 
   return (
     <div className="min-h-screen bg-background">
@@ -166,39 +144,15 @@ const AuctionRoom = () => {
                 <div className="space-y-4">
                   <div className="relative">
                     <img
-                      src={auction.images[selectedImageIndex]}
+                      src={auction.imageUrl || macbookImage}
                       alt={auction.title}
                       className="w-full h-96 object-cover rounded-lg"
                     />
                     <Badge 
-                      className={`absolute top-4 right-4 text-lg px-3 py-1 ${
-                        auction.status === 'LIVE' 
-                          ? 'bg-auction-success text-auction-gold-foreground' 
-                          : 'bg-muted text-muted-foreground'
-                      }`}
+                      className={`absolute top-4 right-4 text-lg px-3 py-1`}
                     >
                       {auction.status}
                     </Badge>
-                  </div>
-                  
-                  <div className="flex gap-2 justify-center">
-                    {auction.images.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImageIndex(index)}
-                        className={`w-16 h-16 rounded-md border-2 overflow-hidden transition-smooth ${
-                          selectedImageIndex === index 
-                            ? 'border-primary' 
-                            : 'border-transparent hover:border-muted-foreground'
-                        }`}
-                      >
-                        <img
-                          src={auction.images[index]}
-                          alt={`${auction.title} view ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
                   </div>
                 </div>
               </CardContent>
@@ -210,14 +164,14 @@ const AuctionRoom = () => {
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-2xl">{auction.title}</CardTitle>
-                    <p className="text-muted-foreground mt-2">{auction.description}</p>
+                    <p className="text-muted mt-2">{auction.description}</p>
                   </div>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setIsWatchlisted(!isWatchlisted)}
-                      className={isWatchlisted ? 'text-auction-danger' : ''}
+                      className={isWatchlisted ? 'text-red-500' : ''}
                     >
                       <Heart className={`w-4 h-4 mr-2 ${isWatchlisted ? 'fill-current' : ''}`} />
                       Watch
@@ -230,22 +184,14 @@ const AuctionRoom = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/50 rounded-lg">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/20 rounded-lg">
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">MSRP</p>
-                    <p className="font-bold">${(auction.msrp / 100).toFixed(2)}</p>
+                    <p className="text-sm text-muted">Participants</p>
+                    <p className="font-bold">{auction.participantCount || 0}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">You Save</p>
-                    <p className="font-bold text-auction-success">{savingsPercent}%</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Participants</p>
-                    <p className="font-bold">{auction.participantCount}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Total Bids</p>
-                    <p className="font-bold">{auction.totalBids}</p>
+                    <p className="text-sm text-muted">Total Bids</p>
+                    <p className="font-bold">{auction.bidCount || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -257,25 +203,25 @@ const AuctionRoom = () => {
             {/* Current Price & Timer */}
             <Card className="text-center">
               <CardHeader>
-                <CardTitle className="text-sm text-muted-foreground">CURRENT PRICE</CardTitle>
-                <div className="text-4xl font-bold text-auction-gold">
+                <CardTitle className="text-sm text-muted">CURRENT PRICE</CardTitle>
+                <div className="text-4xl font-bold text-accent">
                   ${auction.currentPrice.toFixed(2)}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Last bid by: <span className="font-medium">{auction.lastBidder}</span>
+                <p className="text-sm text-muted">
+                  Last bid by: <span className="font-medium text-fg">{auction.lastBidder || 'N/A'}</span>
                 </p>
               </CardHeader>
               <CardContent>
                 <CountdownTimer 
-                  endTime={auction.endTime} 
+                  endTime={new Date(auction.endsAt || 0)}
                   onTimeUp={handleTimeUp}
                   className="mb-4"
                 />
                 
-                {auction.status === 'LIVE' ? (
+                {auction.status === 'open' ? (
                   <BidButton
                     currentPrice={auction.currentPrice}
-                    bidCost={auction.bidCost}
+                    bidCost={1} // Hardcoded for now
                     userCredits={userCredits}
                     onBid={handleBid}
                   />
@@ -285,12 +231,12 @@ const AuctionRoom = () => {
                       <Trophy className="w-5 h-5 mr-2" />
                       Auction Ended
                     </Badge>
-                    {auction.lastBidder === 'You' ? (
-                      <Button className="w-full gradient-primary" size="lg">
+                    {auction.lastBidderId === currentUser?.uid ? (
+                      <Button className="w-full" size="lg">
                         Complete Purchase
                       </Button>
                     ) : (
-                      <p className="text-muted-foreground">
+                      <p className="text-muted">
                         Won by {auction.lastBidder}
                       </p>
                     )}
@@ -309,19 +255,13 @@ const AuctionRoom = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Bids Remaining:</span>
-                  <span className="font-bold text-auction-gold">{userCredits}</span>
+                  <span className="text-muted">Bids Remaining:</span>
+                  <span className="font-bold text-accent">{userCredits}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Your Bids Here:</span>
+                  <span className="text-muted">Your Bids Here:</span>
                   <span className="font-bold">
                     {bids.filter(bid => bid.userId === 'current-user').length}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">If You Win:</span>
-                  <span className="font-bold text-auction-success">
-                    Save ${(savings / 100).toFixed(2)}
                   </span>
                 </div>
                 <div className="pt-2 border-t">
@@ -335,16 +275,16 @@ const AuctionRoom = () => {
 
             {/* Live Activity */}
             <div className="flex items-center gap-2 p-3 bg-card border rounded-lg">
-              <div className="w-2 h-2 bg-auction-success rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <Users className="w-4 h-4" />
-              <span className="text-sm">{auction.participantCount} people watching</span>
+              <span className="text-sm">{auction.participantCount || 0} people watching</span>
             </div>
           </div>
         </div>
 
         {/* Bid History */}
         <div className="mt-8">
-          <BidHistory bids={(bids as any)} currentUserId="current-user" />
+          <BidHistory bids={bids} currentUserId={currentUser?.uid} />
         </div>
       </div>
     </div>

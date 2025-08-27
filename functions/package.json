@@ -1,1 +1,1 @@
-{"name":"snaggle-funcs","private":true,"engines":{"node":"20"},"dependencies":{"firebase-admin":"^12.7.0","firebase-functions":"^4.9.0"},"devDependencies":{"@types/express":"^5.0.3","typescript":"^5.9.2"}}
+{"name":"snaggle-funcs","private":true,"engines":{"node":"20"},"dependencies":{"firebase-admin":"^12.7.0","firebase-functions":"^4.9.0","stripe":"^14.0.0"},"devDependencies":{"@types/express":"^5.0.3","typescript":"^5.9.2"}}
