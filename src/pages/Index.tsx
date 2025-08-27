@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Gavel, Zap, Trophy, Clock, Users, Star } from 'lucide-react';
+import { HOME_COPY } from '@/content/home';
 import macbookImage from '@/assets/macbook-hero.jpg';
 import nintendoImage from '@/assets/nintendo-switch.jpg';
 import airpodsImage from '@/assets/airpods-pro.jpg';
@@ -100,49 +101,40 @@ const Index = () => {
         <div className="container mx-auto relative z-10">
           <div className="flex items-center justify-center gap-3 mb-6">
             <Gavel className="w-12 h-12 text-primary" />
-            <h1 className="text-5xl md:text-6xl font-bold">
-              Welcome to <span className="gradient-primary bg-clip-text text-transparent">Snaggle</span>
-            </h1>
+            <h1 className="text-5xl md:text-6xl font-bold"
+              dangerouslySetInnerHTML={{ __html: HOME_COPY.headline.replace('Snaggle', '<span class="gradient-primary bg-clip-text text-transparent">Snaggle</span>')}}
+            />
           </div>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            The ultimate penny auction experience. Bid smart, save big, and win amazing products 
-            at unbelievable prices. Every bid counts!
+            {HOME_COPY.sub}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button size="lg" className="gradient-primary shadow-glow text-lg px-8">
               <Zap className="w-5 h-5 mr-2" />
-              Start Bidding Now
+              {HOME_COPY.ctaPrimary}
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8">
               <Clock className="w-5 h-5 mr-2" />
-              How It Works
+              {HOME_COPY.ctaSecondary}
             </Button>
           </div>
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <Card className="text-center">
-              <CardHeader>
-                <Trophy className="w-8 h-8 text-auction-gold mx-auto mb-2" />
-                <CardTitle className="text-2xl font-bold text-auction-gold">2,847</CardTitle>
-                <p className="text-muted-foreground">Winners This Month</p>
-              </CardHeader>
-            </Card>
-            <Card className="text-center">
-              <CardHeader>
-                <Users className="w-8 h-8 text-primary mx-auto mb-2" />
-                <CardTitle className="text-2xl font-bold text-primary">12,394</CardTitle>
-                <p className="text-muted-foreground">Active Bidders</p>
-              </CardHeader>
-            </Card>
-            <Card className="text-center">
-              <CardHeader>
-                <Star className="w-8 h-8 text-auction-success mx-auto mb-2" />
-                <CardTitle className="text-2xl font-bold text-auction-success">$2.4M</CardTitle>
-                <p className="text-muted-foreground">Total Savings</p>
-              </CardHeader>
-            </Card>
+            {HOME_COPY.stats.map((stat, index) => (
+              <Card className="text-center" key={index}>
+                <CardHeader>
+                  {index === 0 && <Trophy className="w-8 h-8 text-auction-gold mx-auto mb-2" />}
+                  {index === 1 && <Users className="w-8 h-8 text-primary mx-auto mb-2" />}
+                  {index === 2 && <Star className="w-8 h-8 text-auction-success mx-auto mb-2" />}
+                  <CardTitle className={`text-2xl font-bold ${
+                    index === 0 ? 'text-auction-gold' : index === 1 ? 'text-primary' : 'text-auction-success'
+                  }`}>{stat.value}</CardTitle>
+                  <p className="text-muted-foreground">{stat.label}</p>
+                </CardHeader>
+              </Card>
+            ))}
           </div>
         </div>
       </section>

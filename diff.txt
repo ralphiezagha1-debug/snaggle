@@ -1,0 +1,429 @@
+diff --git a/src/components/UserMenu.tsx b/src/components/UserMenu.tsx
+new file mode 100644
+index 0000000..564bc56
+--- /dev/null
++++ b/src/components/UserMenu.tsx
+@@ -0,0 +1,72 @@
++import {
++  DropdownMenu,
++  DropdownMenuContent,
++  DropdownMenuItem,
++  DropdownMenuLabel,
++  DropdownMenuPortal,
++  DropdownMenuSeparator,
++  DropdownMenuTrigger,
++} from "@/components/ui/dropdown-menu"
++import { Avatar, AvatarFallback } from "@/components/ui/avatar"
++import { CreditCard, LogOut, Settings, Trophy, User } from "lucide-react"
++
++interface UserMenuProps {
++  userCredits?: number
++  userName?: string
++}
++
++export function UserMenu({
++  userCredits = 0,
++  userName = "Guest",
++}: UserMenuProps) {
++  return (
++    <DropdownMenu>
++      <DropdownMenuTrigger asChild>
++        <div className="flex items-center gap-3 cursor-pointer">
++          <div className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium whitespace-nowrap">
++            {userCredits} Credits
++          </div>
++          <Avatar className="w-8 h-8">
++            <AvatarFallback>
++              {userName.substring(0, 2).toUpperCase()}
++            </AvatarFallback>
++          </Avatar>
++        </div>
++      </DropdownMenuTrigger>
++      <DropdownMenuPortal>
++        <DropdownMenuContent
++          className="w-64 max-w-[90vw] whitespace-nowrap"
++          align="end"
++          sideOffset={8}
++        >
++          <DropdownMenuLabel>
++            <div className="flex flex-col space-y-1">
++              <p className="text-sm font-medium leading-none">{userName}</p>
++              <p className="text-xs leading-none text-muted-foreground">
++                {userCredits} bid credits remaining
++              </p>
++            </div>
++          </DropdownMenuLabel>
++          <DropdownMenuSeparator />
++          <DropdownMenuItem>
++            <CreditCard className="mr-2 h-4 w-4" />
++            <span>Buy More Credits</span>
++          </DropdownMenuItem>
++          <DropdownMenuItem>
++            <Trophy className="mr-2 h-4 w-4" />
++            <span>My Auctions</span>
++          </DropdownMenuItem>
++          <DropdownMenuItem>
++            <Settings className="mr-2 h-4 w-4" />
++            <span>Settings</span>
++          </DropdownMenuItem>
++          <DropdownMenuSeparator />
++          <DropdownMenuItem className="text-destructive">
++            <LogOut className="mr-2 h-4 w-4" />
++            <span>Sign Out</span>
++          </DropdownMenuItem>
++        </DropdownMenuContent>
++      </DropdownMenuPortal>
++    </DropdownMenu>
++  )
++}
+diff --git a/src/components/layout/Header.tsx b/src/components/layout/Header.tsx
+index 46a8d4f..6f31843 100644
+--- a/src/components/layout/Header.tsx
++++ b/src/components/layout/Header.tsx
+@@ -2,15 +2,13 @@
+ import { Button } from '@/components/ui/button';
+ import {
+   NavigationMenu,
+-  NavigationMenuContent,
+   NavigationMenuItem,
+   NavigationMenuLink,
+   NavigationMenuList,
+-  NavigationMenuTrigger,
+ } from '@/components/ui/navigation-menu';
+-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+-import { Wallet, Gavel, User, LogOut, CreditCard, Trophy, Settings } from 'lucide-react';
++import { Gavel } from 'lucide-react';
+ import { cn } from '@/lib/utils';
++import { UserMenu } from '@/components/UserMenu';
+
+ interface HeaderProps {
+   userCredits?: number;
+@@ -20,131 +18,72 @@ interface HeaderProps {
+
+ export const Header = ({ userCredits = 0, userName = "Guest", isAuthenticated = false }: HeaderProps) => {
+   return (
+-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+-      <div className="container flex h-16 items-center justify-between">
+-        {/* Logo */}
+-        <div className="flex items-center gap-2">
+-          <Gavel className="w-8 h-8 text-primary" />
+-          <h1 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
+-            Snaggle
+-          </h1>
+-        </div>
+-
+-        {/* Navigation */}
+-        <NavigationMenu className="hidden md:flex">
+-          <NavigationMenuList>
+-            <NavigationMenuItem>
+-              <NavigationMenuLink
+-                href="/"
+-                className={cn(
+-                  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+-                )}
+-              >
+-                Live Auctions
+-              </NavigationMenuLink>
+-            </NavigationMenuItem>
+-
+-            <NavigationMenuItem>
+-              <NavigationMenuLink
+-                href="/wallet"
+-                className={cn(
+-                  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+-                )}
+-              >
+-                Buy Credits
+-              </NavigationMenuLink>
+-            </NavigationMenuItem>
+-
+-            <NavigationMenuItem>
+-              <NavigationMenuLink
+-                href="/how-it-works"
+-                className={cn(
+-                  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+-                )}
+-              >
+-                How It Works
+-              </NavigationMenuLink>
+-            </NavigationMenuItem>
+-          </NavigationMenuList>
+-        </NavigationMenu>
+-
+-        {/* User Actions */}
+-        <div className="flex items-center gap-4">
+-          {/* Credits Display */}
+-          {isAuthenticated && (
+-            <div className="flex items-center gap-2 bg-card border rounded-lg px-3 py-2">
+-              <Wallet className="w-4 h-4 text-auction-gold" />
+-              <span className="font-bold text-auction-gold">{userCredits}</span>
+-              <span className="text-xs text-muted-foreground">credits</span>
++    <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur">
++      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
++        <div className="h-16 flex items-center justify-between gap-4">
++          {/* Logo & Nav */}
++          <div className="flex items-center gap-8">
++            <div className="flex items-center gap-2">
++              <Gavel className="w-8 h-8 text-primary" />
++              <h1 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
++                Snaggle
++              </h1>
+             </div>
+-          )}
+-
+-          {/* User Menu */}
+-          {isAuthenticated ? (
+-            <NavigationMenu>
++
++            {/* Navigation */}
++            <NavigationMenu className="hidden md:flex">
+               <NavigationMenuList>
+                 <NavigationMenuItem>
+-                  <NavigationMenuTrigger className="h-10 p-0">
+-                    <Avatar className="w-8 h-8">
+-                      <AvatarFallback>
+-                        {userName.substring(0, 2).toUpperCase()}
+-                      </AvatarFallback>
+-                    </Avatar>
+-                  </NavigationMenuTrigger>
+-                  <NavigationMenuContent>
+-                    <div className="w-64 p-4 space-y-2">
+-                      <div className="pb-2 border-b">
+-                        <p className="font-medium">{userName}</p>
+-                        <p className="text-sm text-muted-foreground">
+-                          {userCredits} bid credits remaining
+-                        </p>
+-                      </div>
+-
+-                      <NavigationMenuLink
+-                        href="/wallet"
+-                        className="flex items-center gap-2 w-full p-2 rounded-md hover:bg-accent transition-colors"
+-                      >
+-                        <CreditCard className="w-4 h-4" />
+-                        <span>Buy More Credits</span>
+-                      </NavigationMenuLink>
+-
+-                      <NavigationMenuLink
+-                        href="/my-auctions"
+-                        className="flex items-center gap-2 w-full p-2 rounded-md hover:bg-accent transition-colors"
+-                      >
+-                        <Trophy className="w-4 h-4" />
+-                        <span>My Auctions</span>
+-                      </NavigationMenuLink>
+-
+-                      <NavigationMenuLink
+-                        href="/settings"
+-                        className="flex items-center gap-2 w-full p-2 rounded-md hover:bg-accent transition-colors"
+-                      >
+-                        <Settings className="w-4 h-4" />
+-                        <span>Settings</span>
+-                      </NavigationMenuLink>
+-
+-                      <div className="pt-2 border-t">
+-                        <button className="flex items-center gap-2 w-full p-2 rounded-md hover:bg-accent transition-colors text-destructive">
+-                          <LogOut className="w-4 h-4" />
+-                          <span>Sign Out</span>
+-                        </button>
+-                      </div>
+-                    </div>
+-                  </NavigationMenuContent>
++                  <NavigationMenuLink
++                    href="/"
++                    className={cn(
++                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
++                    )}
++                  >
++                    Live Auctions
++                  </NavigationMenuLink>
++                </NavigationMenuItem>
++
++                <NavigationMenuItem>
++                  <NavigationMenuLink
++                    href="/wallet"
++                    className={cn(
++                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
++                    )}
++                  >
++                    Buy Credits
++                  </NavigationMenuLink>
++                </NavigationMenuItem>
++
++                <NavigationMenuItem>
++                  <NavigationMenuLink
++                    href="/how-it-works"
++                    className={cn(
++                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
++                    )}
++                  >
++                    How It Works
++                  </NavigationMenuLink>
+                 </NavigationMenuItem>
+               </NavigationMenuList>
+             </NavigationMenu>
+-          ) : (
+-            <div className="flex items-center gap-2">
+-              <Button variant="ghost" size="sm">
+-                Sign In
+-              </Button>
+-              <Button size="sm" className="gradient-primary">
+-                Get Started
+-              </Button>
+-            </div>
+-          )}
++          </div>
++
++          {/* User Actions */}
++          <div className="flex items-center gap-3 shrink-0">
++            {isAuthenticated ? (
++              <UserMenu userName={userName} userCredits={userCredits} />
++            ) : (
++              <div className="flex items-center gap-2">
++                <Button variant="ghost" size="sm">
++                  Sign In
++                </Button>
++                <Button size="sm" className="gradient-primary">
++                  Get Started
++                </Button>
++              </div>
++            )}
++          </div>
+         </div>
+       </div>
+     </header>
+diff --git a/src/content/home.ts b/src/content/home.ts
+new file mode 100644
+index 0000000..9b87118
+--- /dev/null
++++ b/src/content/home.ts
+@@ -0,0 +1,11 @@
++export const HOME_COPY = {
++  headline: "Welcome to Snaggle",
++  sub: "The ultimate penny auction experience. Bid smart, save big, and win amazing products at unbelievable prices. Every bid counts!",
++  ctaPrimary: "Start Bidding Now",
++  ctaSecondary: "How It Works",
++  stats: [
++    { label: "Winners This Month", value: "2,847" },
++    { label: "Active Bidders", value: "12,394" },
++    { label: "Total Savings", value: "$2.4M" },
++  ],
++};
+diff --git a/src/index.css b/src/index.css
+index 81465ab..676be43 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -1,3 +1,9 @@
+-﻿@tailwind base;
++@import './styles/theme.css';
++
++html, body {
++  overflow-x: hidden;
++}
++
++@tailwind base;
+ @tailwind components;
+ @tailwind utilities;
+diff --git a/src/pages/Index.tsx b/src/pages/Index.tsx
+index 43767eb..0ecf719 100644
+--- a/src/pages/Index.tsx
++++ b/src/pages/Index.tsx
+@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
+ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+ import { Gavel, Zap, Trophy, Clock, Users, Star } from 'lucide-react';
++import { HOME_COPY } from '@/content/home';
+ import macbookImage from '@/assets/macbook-hero.jpg';
+ import nintendoImage from '@/assets/nintendo-switch.jpg';
+ import airpodsImage from '@/assets/airpods-pro.jpg';
+@@ -100,49 +101,40 @@ const Index = () => {
+         <div className="container mx-auto relative z-10">
+           <div className="flex items-center justify-center gap-3 mb-6">
+             <Gavel className="w-12 h-12 text-primary" />
+-            <h1 className="text-5xl md:text-6xl font-bold">
+-              Welcome to <span className="gradient-primary bg-clip-text text-transparent">Snaggle</span>
+-            </h1>
++            <h1 className="text-5xl md:text-6xl font-bold"
++              dangerouslySetInnerHTML={{ __html: HOME_COPY.headline.replace('Snaggle', '<span class="gradient-primary bg-clip-text text-transparent">Snaggle</span>')}}
++            />
+           </div>
+           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+-            The ultimate penny auction experience. Bid smart, save big, and win amazing products
+-            at unbelievable prices. Every bid counts!
++            {HOME_COPY.sub}
+           </p>
+
+           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+             <Button size="lg" className="gradient-primary shadow-glow text-lg px-8">
+               <Zap className="w-5 h-5 mr-2" />
+-              Start Bidding Now
++              {HOME_COPY.ctaPrimary}
+             </Button>
+             <Button size="lg" variant="outline" className="text-lg px-8">
+               <Clock className="w-5 h-5 mr-2" />
+-              How It Works
++              {HOME_COPY.ctaSecondary}
+             </Button>
+           </div>
+
+           {/* Quick Stats */}
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+-            <Card className="text-center">
+-              <CardHeader>
+-                <Trophy className="w-8 h-8 text-auction-gold mx-auto mb-2" />
+-                <CardTitle className="text-2xl font-bold text-auction-gold">2,847</CardTitle>
+-                <p className="text-muted-foreground">Winners This Month</p>
+-              </CardHeader>
+-            </Card>
+-            <Card className="text-center">
+-              <CardHeader>
+-                <Users className="w-8 h-8 text-primary mx-auto mb-2" />
+-                <CardTitle className="text-2xl font-bold text-primary">12,394</CardTitle>
+-                <p className="text-muted-foreground">Active Bidders</p>
+-              </CardHeader>
+-            </Card>
+-            <Card className="text-center">
+-              <CardHeader>
+-                <Star className="w-8 h-8 text-auction-success mx-auto mb-2" />
+-                <CardTitle className="text-2xl font-bold text-auction-success">$2.4M</CardTitle>
+-                <p className="text-muted-foreground">Total Savings</p>
+-              </CardHeader>
+-            </Card>
++            {HOME_COPY.stats.map((stat, index) => (
++              <Card className="text-center" key={index}>
++                <CardHeader>
++                  {index === 0 && <Trophy className="w-8 h-8 text-auction-gold mx-auto mb-2" />}
++                  {index === 1 && <Users className="w-8 h-8 text-primary mx-auto mb-2" />}
++                  {index === 2 && <Star className="w-8 h-8 text-auction-success mx-auto mb-2" />}
++                  <CardTitle className={`text-2xl font-bold ${
++                    index === 0 ? 'text-auction-gold' : index === 1 ? 'text-primary' : 'text-auction-success'
++                  }`}>{stat.value}</CardTitle>
++                  <p className="text-muted-foreground">{stat.label}</p>
++                </CardHeader>
++              </Card>
++            ))}
+           </div>
+         </div>
+       </section>
+diff --git a/src/styles/theme.css b/src/styles/theme.css
+new file mode 100644
+index 0000000..3b40662
+--- /dev/null
++++ b/src/styles/theme.css
+@@ -0,0 +1,6 @@
++:root {
++  --brand: 260 90% 56%;
++  --brand-foreground: 0 0% 100%;
++  --primary: var(--brand);
++  --primary-foreground: var(--brand-foreground);
++}
+diff --git a/tailwind.config.ts b/tailwind.config.ts
+index ddd0727..2c6e24d 100644
+--- a/tailwind.config.ts
++++ b/tailwind.config.ts
+@@ -20,6 +20,7 @@ export default {
+		},
+		extend: {
+			colors: {
++				brand: { DEFAULT: "hsl(var(--brand))", foreground: "hsl(var(--brand-foreground))" },
+				border: 'hsl(var(--border))',
+				input: 'hsl(var(--input))',
+				ring: 'hsl(var(--ring))',
