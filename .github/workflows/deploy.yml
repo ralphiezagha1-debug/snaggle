@@ -23,6 +23,11 @@ jobs:
         run: npm run lint --if-present
       - name: Typecheck
         run: npm run typecheck --if-present
+      - name: Check for hard-coded colors
+        run: |
+          if git grep -nE 'text-(gray|slate|neutral)-|bg-(gray|slate|neutral|indigo|violet)-' -- src; then
+            echo "Found hard-coded Tailwind colors. Use tokens/utilities instead."; exit 1;
+          fi
       - name: Build
         run: npm run build
       - uses: actions/upload-artifact@v4

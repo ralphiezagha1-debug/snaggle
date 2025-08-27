@@ -43,30 +43,30 @@ export function UserMenu({
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{userName}</p>
-              <p className="text-xs leading-none text-muted-foreground">
+              <p className="text-xs leading-none text-muted">
                 {userCredits} bid credits remaining
               </p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+          <DropdownMenuItem asChild className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             <Link to="/credits">
               <CreditCard className="mr-2 h-4 w-4" />
               <span>Buy More Credits</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+          <DropdownMenuItem asChild className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             <Link to="/my-auctions">
               <Trophy className="mr-2 h-4 w-4" />
               <span>My Auctions</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+          <DropdownMenuItem className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+          <DropdownMenuItem className="text-destructive focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Sign Out</span>
           </DropdownMenuItem>

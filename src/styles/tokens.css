@@ -1,0 +1,16 @@
+:root{
+  --brand-primary:#6A5AE0;      /* Snaggle Purple */
+  --brand-primary-600:#5a4dcb;
+  --brand-primary-700:#4b40b3;
+  --brand-accent:#FFB020;       /* Gold */
+  --brand-bg:#ffffff;
+  --brand-fg:#0f172a;           /* slate-900 */
+  --brand-muted:#64748b;        /* slate-500 */
+  --brand-ring:#c7d2fe;         /* indigo-200 */
+}
+[data-theme="dark"]{
+  --brand-bg:#0b1020;
+  --brand-fg:#e5e7eb;
+  --brand-muted:#9aa4b2;
+  --brand-ring:#272a45;
+}

@@ -1,5 +1,5 @@
 export interface UserCredits {
   uid: string;
-  balance: number;
+  credits: number;
   updatedAt?: number;
 }

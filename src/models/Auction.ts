@@ -10,4 +10,8 @@ export interface Auction {
   endsAt?: number;   // ms epoch
   createdAt?: number;
   updatedAt?: number;
+  lastBidder?: string;
+  lastBidderId?: string;
+  bidCount?: number;
+  participantCount?: number;
 }

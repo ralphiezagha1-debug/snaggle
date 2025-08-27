@@ -105,16 +105,16 @@ const Index = () => {
               dangerouslySetInnerHTML={{ __html: HOME_COPY.headline.replace('Snaggle', '<span class="text-primary">Snaggle</span>')}}
             />
           </div>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-muted mb-8 max-w-2xl mx-auto">
             {HOME_COPY.sub}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button size="lg" className="text-lg px-8 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <Button size="lg" className="text-lg px-8 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
               <Zap className="w-5 h-5 mr-2" />
               {HOME_COPY.ctaPrimary}
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <Button size="lg" variant="outline" className="text-lg px-8 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
               <Clock className="w-5 h-5 mr-2" />
               {HOME_COPY.ctaSecondary}
             </Button>
@@ -129,7 +129,7 @@ const Index = () => {
                   {index === 1 && <Users className="w-8 h-8 text-primary mx-auto mb-2" />}
                   {index === 2 && <Star className="w-8 h-8 text-primary mx-auto mb-2" />}
                   <CardTitle className="text-2xl font-bold text-primary">{stat.value}</CardTitle>
-                  <p className="text-muted-foreground">{stat.label}</p>
+                  <p className="text-muted">{stat.label}</p>
                 </CardHeader>
               </Card>
             ))}
@@ -142,7 +142,7 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Live Auctions</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-muted max-w-2xl mx-auto">
               Join thousands of smart shoppers who save up to 95% on brand new products. 
               Every auction starts at $0.00 and increases by just $0.01 per bid!
             </p>
@@ -188,9 +188,9 @@ const Index = () => {
 
             <TabsContent value="ended">
               <div className="text-center py-12">
-                <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <Trophy className="w-16 h-16 text-muted mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No Ended Auctions</h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted">
                   Auction results will appear here after auctions end.
                 </p>
               </div>
@@ -204,7 +204,7 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">How Snaggle Works</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-muted max-w-2xl mx-auto">
               Simple, fair, and exciting. Here's how our penny auctions work.
             </p>
           </div>
@@ -213,12 +213,12 @@ const Index = () => {
             <Card>
               <CardHeader className="text-center">
                 <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary-foreground font-bold text-xl">1</span>
+                  <span className="text-white font-bold text-xl">1</span>
                 </div>
                 <CardTitle>Buy Bid Credits</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
-                <p className="text-muted-foreground">
+                <p className="text-muted">
                   Purchase bid packs to get started. Each bid typically costs between $0.50-$1.00.
                 </p>
               </CardContent>
@@ -227,12 +227,12 @@ const Index = () => {
             <Card>
               <CardHeader className="text-center">
                 <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary-foreground font-bold text-xl">2</span>
+                  <span className="text-white font-bold text-xl">2</span>
                 </div>
                 <CardTitle>Place Your Bids</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
-                <p className="text-muted-foreground">
+                <p className="text-muted">
                   Each bid increases the price by $0.01 and resets the countdown timer.
                 </p>
               </CardContent>
@@ -241,12 +241,12 @@ const Index = () => {
             <Card>
               <CardHeader className="text-center">
                 <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary-foreground font-bold text-xl">3</span>
+                  <span className="text-white font-bold text-xl">3</span>
                 </div>
                 <CardTitle>Win & Save</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
-                <p className="text-muted-foreground">
+                <p className="text-muted">
                   Be the last bidder when time runs out and win at the final price!
                 </p>
               </CardContent>
@@ -264,7 +264,7 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="border-t py-8 px-4">
-        <div className="container mx-auto text-center text-muted-foreground">
+        <div className="container mx-auto text-center text-muted">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Gavel className="w-5 h-5" />
             <span className="font-semibold">Snaggle</span>

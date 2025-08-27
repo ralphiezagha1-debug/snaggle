@@ -2,14 +2,18 @@ import type { BidApi, Unsubscribe } from '@/api/bidApi';
 import type { Auction } from '@/models/Auction';
 import type { Bid } from '@/models/Bid';
 import type { UserCredits } from '@/models/UserCredits';
-import { db } from '@/platforms/firebase/app';
+import { app, db } from '@/platforms/firebase/app';
 import {
-  collection, doc, getDoc, getDocs, query, where, onSnapshot, orderBy, limit as qlimit
+  collection, doc, getDoc, getDocs, query, where, onSnapshot, orderBy, limit as qlimit, setDoc, increment, serverTimestamp
 } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 function noimpl(name: string): never {
   throw new Error(`Not implemented: ${name}`);
 }
+
+const functions = getFunctions(app);
+const placeBidFn = httpsCallable(functions, 'placeBid');
 
 const api: BidApi = {
   async getAuctions(args) {
@@ -41,13 +45,29 @@ const api: BidApi = {
     });
   },
   async placeBid(auctionId) {
-    noimpl('functions: placeBid');
+    const result = await placeBidFn({ auctionId });
+    return result.data as { ok: true };
   },
   async getCredits(uid) {
-    noimpl('getCredits');
+    const d = await getDoc(doc(db, 'users', uid));
+    if (!d.exists()) return null;
+    const data = d.data();
+    return { uid: d.id, credits: data.credits || 0, updatedAt: data.updatedAt };
   },
   async creditBalance(uid, delta) {
-    noimpl('creditBalance');
+    const ref = doc(db, 'users', uid);
+    await setDoc(ref, {
+      credits: increment(delta),
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+    const d = await getDoc(ref);
+    return d.data()?.credits ?? delta;
+  },
+  getPurchaseHistory: async function (uid: string): Promise<any[]> {
+    const col = collection(db, 'users', uid, 'purchases');
+    const q = query(col, orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
   },
   async createAuction(init) {
     noimpl('createAuction');
