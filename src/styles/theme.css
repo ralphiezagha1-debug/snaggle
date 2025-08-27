@@ -1,0 +1,6 @@
+:root {
+  --brand: 260 90% 56%;
+  --brand-foreground: 0 0% 100%;
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+}

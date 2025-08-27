@@ -1,3 +1,9 @@
-﻿@tailwind base;
+@import './styles/theme.css';
+
+html, body {
+  overflow-x: hidden;
+}
+
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
