@@ -2,11 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Brand: all text green on black in dark mode, using semantic CSS variables.
-   We avoid Tailwind @apply of custom utilities to satisfy CI's checks. */
+/* Brand tokens: black + white with green accents (CI-safe semantic variables) */
 @layer base {
   :root {
-    /* Light palette (kept default) */
+    /* Light (not primary for your site, kept reasonable) */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -14,11 +13,11 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Brand accent green */
+    /* Brand green accent (≈ emerald 600) */
     --primary: 142.1 70.6% 45.3%;
     --primary-foreground: 145 86% 10%;
 
-    --secondary: 210 40% 96%;
+    --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
@@ -37,36 +36,30 @@
     --radius: 0.5rem;
   }
 
-  /* DARK MODE: black background, ALL text green */
+  /* Default to dark mode in your site: black bg, white text, green accents */
   .dark {
-    --background: 0 0% 7%;               /* near-black */
-    --foreground: 142.1 70.6% 45.3%;     /* GREEN text everywhere */
+    --background: 0 0% 7%;          /* near-black */
+    --foreground: 210 40% 98%;      /* off-white text */
     --card: 0 0% 9%;
-    --card-foreground: 142.1 70.6% 45.3%;
+    --card-foreground: 210 40% 98%;
     --popover: 0 0% 7%;
-    --popover-foreground: 142.1 70.6% 45.3%;
-
-    --primary: 142.1 70.6% 45.3%;        /* brand green */
-    --primary-foreground: 0 0% 0%;       /* black/dark text on green surfaces */
-
+    --popover-foreground: 210 40% 98%;
+    --primary: 142.1 70.6% 45.3%;   /* brand green */
+    --primary-foreground: 0 0% 0%;
     --secondary: 147 21% 14%;
-    --secondary-foreground: 142.1 70.6% 45.3%;
-
+    --secondary-foreground: 210 40% 98%;
     --muted: 147 21% 14%;
-    --muted-foreground: 142.1 45% 60%;
-
+    --muted-foreground: 217.9 10.6% 64.9%;
     --accent: 142.1 70.6% 45.3%;
     --accent-foreground: 0 0% 0%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-
     --border: 147 15% 18%;
     --input: 147 15% 18%;
     --ring: 142.1 70.6% 45.3%;
   }
 
-  /* Use CSS vars directly to avoid custom utility lookups */
+  /* Apply tokens without @apply custom utilities */
   * { border-color: hsl(var(--border)); }
   body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
 }
