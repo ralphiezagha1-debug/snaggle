@@ -73,3 +73,7 @@
   * { border-color: hsl(var(--border)); }
   body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
 }
+@layer base {
+  a { color: hsl(var(--primary)); }
+  a:hover { color: hsl(var(--primary) / 0.9); }
+}
