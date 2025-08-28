@@ -9,11 +9,12 @@ import { loadBidApi } from '@/api';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from 'date-fns';
-import type { Purchase } from '@/models/User';
+import type { Purchase } from '@/models/Purchase';
+import type { UserCredits } from '@/models/UserCredits';
 
 const Wallet = () => {
   const { toast } = useToast();
-  const [userCredits, setUserCredits] = useState(0);
+  const [userCredits, setUserCredits] = useState<UserCredits | null>(null);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
@@ -25,14 +26,14 @@ const Wallet = () => {
         const bidApi = await loadBidApi();
         try {
           const creditsData = await bidApi.getCredits(user.uid);
-          setUserCredits(creditsData?.credits ?? 0);
+          setUserCredits(creditsData);
           const purchaseHistory = await bidApi.getPurchaseHistory(user.uid);
-          setPurchases(purchaseHistory as Purchase[]);
+          setPurchases((purchaseHistory as Purchase[]) ?? []);
         } catch (error: any) {
           toast({ title: "Error", description: "Could not fetch wallet data.", variant: "destructive" });
         }
       } else {
-        setUserCredits(0);
+        setUserCredits(null);
         setPurchases([]);
       }
     });
@@ -41,7 +42,7 @@ const Wallet = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userCredits={userCredits} userName={currentUser?.displayName || 'Guest'} isAuthenticated={!!currentUser} />
+      <Header userCredits={userCredits?.balance ?? 0} userName={currentUser?.displayName || 'Guest'} isAuthenticated={!!currentUser} />
       <div className="container mx-auto p-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold">My Wallet</h1>
@@ -57,7 +58,7 @@ const Wallet = () => {
                 <CardTitle>Current Balance</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-5xl font-bold text-primary">{userCredits}</p>
+                <p className="text-5xl font-bold text-primary">{userCredits?.balance ?? 0}</p>
                 <p className="text-muted">credits available</p>
               </CardContent>
             </Card>
@@ -77,7 +78,7 @@ const Wallet = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {purchases.map((purchase) => (
+                    {(purchases ?? []).map((purchase) => (
                       <TableRow key={purchase.id}>
                         <TableCell>{format(new Date(purchase.createdAt), 'PPP')}</TableCell>
                         <TableCell>{purchase.credits}</TableCell>

@@ -19,10 +19,14 @@ jobs:
           cache: npm
       - name: Install deps
         run: npm ci || npm install --no-audit --no-fund
+      - name: Install functions deps
+        run: npm ci --prefix functions || npm install --prefix functions --no-audit --no-fund
       - name: Lint
         run: npm run lint --if-present
       - name: Typecheck
         run: npm run typecheck --if-present
+      - name: Typecheck functions
+        run: npm run typecheck --prefix functions --if-present
       - name: Check for hard-coded colors
         run: |
           if git grep -nE 'text-(gray|slate|neutral)-|bg-(gray|slate|neutral|indigo|violet)-' -- src; then

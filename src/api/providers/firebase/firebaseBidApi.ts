@@ -52,7 +52,7 @@ const api: BidApi = {
     const d = await getDoc(doc(db, 'users', uid));
     if (!d.exists()) return null;
     const data = d.data();
-    return { uid: d.id, credits: data.credits || 0, updatedAt: data.updatedAt };
+    return { uid: d.id, balance: data.credits || 0, updatedAt: data.updatedAt };
   },
   async creditBalance(uid, delta) {
     const ref = doc(db, 'users', uid);

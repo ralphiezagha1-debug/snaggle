@@ -1,8 +1,8 @@
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { Stripe } from "stripe";
+import Stripe from "stripe";
 import { defineString } from 'firebase-functions/params';
-import * as express from "express";
+import express from "express";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
 // It is recommended to store secrets in environment variables
@@ -18,7 +18,7 @@ const db = getFirestore();
 const app = express();
 
 // Use express.raw for the webhook endpoint
-app.post('/', express.raw({ type: 'application/json' }), async (req, res) => {
+app.post('/', express.raw({ type: 'application/json' }), async (req: express.Request, res: express.Response) => {
   const sig = req.headers['stripe-signature'];
 
   if (!sig) {

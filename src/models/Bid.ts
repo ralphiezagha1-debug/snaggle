@@ -1,7 +1,8 @@
 export interface Bid {
   id: string;
   auctionId: string;
-  bidderId: string;
-  amount: number;
-  createdAt: number; // ms epoch
+  userId: string;
+  userName: string;
+  price: number;
+  timestamp: number; // ms epoch
 }

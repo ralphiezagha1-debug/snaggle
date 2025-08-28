@@ -3,15 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
-
-interface Bid {
-  id: string;
-  userId: string;
-  userName: string;
-  price: number;
-  timestamp: Date;
-  isWinning?: boolean;
-}
+import type { Bid } from '@/models/Bid';
 
 interface BidHistoryProps {
   bids: Bid[];

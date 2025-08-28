@@ -1,6 +1,7 @@
 import type { Auction } from '@/models/Auction';
 import type { Bid } from '@/models/Bid';
 import type { UserCredits } from '@/models/UserCredits';
+import type { Purchase } from '@/models/Purchase';
 
 export type Unsubscribe = () => void;
 
@@ -18,7 +19,7 @@ export interface BidApi {
   // Credits
   getCredits(uid: string): Promise<UserCredits | null>;
   creditBalance(uid: string, delta: number): Promise<number>;
-  getPurchaseHistory(uid: string): Promise<any[]>; // TODO: Use Purchase model
+  getPurchaseHistory(uid:string): Promise<Purchase[]>;
 
   // Admin-ish
   createAuction(init: Partial<Auction>): Promise<string>;

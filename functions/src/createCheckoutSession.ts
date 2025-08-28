@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { Stripe } from "stripe";
+import Stripe from "stripe";
 import { defineString } from 'firebase-functions/params';
 
 // It is recommended to store secrets in environment variables

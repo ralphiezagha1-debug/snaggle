@@ -13,6 +13,7 @@ import macbookImage from '@/assets/macbook-hero.jpg';
 import { loadBidApi } from '@/api';
 import type { Auction } from '@/models/Auction';
 import type { Bid } from '@/models/Bid';
+import type { UserCredits } from '@/models/UserCredits';
 import type { Unsubscribe } from '@/api/bidApi';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/platforms/firebase/app';
@@ -23,9 +24,8 @@ const AuctionRoom = () => {
   const { toast } = useToast();
   const [auction, setAuction] = useState<Auction | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
-  const [userCredits, setUserCredits] = useState(0);
+  const [userCredits, setUserCredits] = useState<UserCredits | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isWatchlisted, setIsWatchlisted] = useState(false);
 
   useEffect(() => {
@@ -35,9 +35,9 @@ const AuctionRoom = () => {
       if (user) {
         const bidApi = await loadBidApi();
         const credits = await bidApi.getCredits(user.uid);
-        setUserCredits(credits?.balance ?? 0);
+        setUserCredits(credits);
       } else {
-        setUserCredits(0);
+        setUserCredits(null);
       }
     });
     return unsubscribe;
@@ -57,7 +57,7 @@ const AuctionRoom = () => {
       });
 
       bidsUnsubscribe = bidApi.watchRecentBids(id, 20, (newBids) => {
-        setBids(newBids);
+        setBids(newBids ?? []);
       });
     };
 
@@ -84,7 +84,7 @@ const AuctionRoom = () => {
     }
     if (!auction) return;
 
-    if (userCredits < 1) { // Assuming bid cost is 1
+    if ((userCredits?.balance ?? 0) < 1) { // Assuming bid cost is 1
       toast({
         title: "Insufficient Credits",
         description: "You don't have enough bid credits. Purchase more to continue bidding.",
@@ -100,7 +100,7 @@ const AuctionRoom = () => {
         title: "Bid Placed Successfully!",
         description: "You are the new highest bidder.",
       });
-      setUserCredits(prev => prev - 1);
+      setUserCredits(prev => prev ? { ...prev, balance: prev.balance - 1 } : null);
     } catch (error: any) {
       toast({
         title: "Bid Failed",
@@ -111,14 +111,14 @@ const AuctionRoom = () => {
   };
 
   const handleTimeUp = () => {
-    setAuction(prev => ({ ...prev!, status: 'closed' }));
+    setAuction(prev => prev ? ({ ...prev, status: 'closed' }) : null);
     
-    if (auction.lastBidderId === currentUser?.uid) {
+    if (auction?.lastBidderId === currentUser?.uid) {
       toast({
         title: "🎉 Congratulations! You Won!",
         description: `You won the ${auction.title} for $${auction.currentPrice.toFixed(2)}!`,
       });
-    } else {
+    } else if (auction) {
       toast({
         title: "Auction Ended",
         description: `${auction.lastBidder} won this auction.`,
@@ -129,9 +129,9 @@ const AuctionRoom = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header 
-        userCredits={userCredits} 
-        userName="You" 
-        isAuthenticated={true} 
+        userCredits={userCredits?.balance ?? 0}
+        userName={currentUser?.displayName ?? "Guest"}
+        isAuthenticated={!!currentUser}
       />
       
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -222,7 +222,7 @@ const AuctionRoom = () => {
                   <BidButton
                     currentPrice={auction.currentPrice}
                     bidCost={1} // Hardcoded for now
-                    userCredits={userCredits}
+                    userCredits={userCredits?.balance ?? 0}
                     onBid={handleBid}
                   />
                 ) : (
@@ -256,12 +256,12 @@ const AuctionRoom = () => {
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted">Bids Remaining:</span>
-                  <span className="font-bold text-accent">{userCredits}</span>
+                  <span className="font-bold text-accent">{userCredits?.balance ?? 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted">Your Bids Here:</span>
                   <span className="font-bold">
-                    {bids.filter(bid => bid.userId === 'current-user').length}
+                    {(bids ?? []).filter(bid => bid.userId === currentUser?.uid).length}
                   </span>
                 </div>
                 <div className="pt-2 border-t">
@@ -284,7 +284,7 @@ const AuctionRoom = () => {
 
         {/* Bid History */}
         <div className="mt-8">
-          <BidHistory bids={bids} currentUserId={currentUser?.uid} />
+          <BidHistory bids={bids ?? []} currentUserId={currentUser?.uid} />
         </div>
       </div>
     </div>
