@@ -2,10 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Brand: green + black — semantic tokens so CI's "no hard-coded colors" passes */
+/* Brand: green + black using CSS variables (semantic tokens)
+   Avoid @apply of non-existent utilities like `border-border`.
+*/
 @layer base {
   :root {
-    /* light (kept sane, accent green) */
+    /* Light palette (kept minimal; app defaults to dark via <html class="dark">) */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -13,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* brand accent green (≈ tailwind emerald-600) */
+    /* Brand accent green */
     --primary: 142.1 70.6% 45.3%;
     --primary-foreground: 145 86% 10%;
 
@@ -36,9 +38,9 @@
     --radius: 0.5rem;
   }
 
-  /* default look we want: black UI with green accents */
+  /* Default dark: near-black with green accents */
   .dark {
-    --background: 0 0% 7%;        /* near-black */
+    --background: 0 0% 7%;
     --foreground: 210 40% 98%;
 
     --card: 0 0% 9%;
@@ -67,6 +69,7 @@
     --ring: 142.1 70.6% 45.3%;
   }
 
-  * { @apply border-border; }
-  body { @apply bg-background text-foreground; }
+  /* Use CSS variables directly to avoid Tailwind utility resolution issues */
+  * { border-color: hsl(var(--border)); }
+  body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
 }
