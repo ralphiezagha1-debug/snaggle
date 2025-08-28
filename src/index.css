@@ -2,12 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Brand: green + black using CSS variables (semantic tokens)
-   Avoid @apply of non-existent utilities like `border-border`.
-*/
+/* Brand: all text green on black in dark mode, using semantic CSS variables.
+   We avoid Tailwind @apply of custom utilities to satisfy CI's checks. */
 @layer base {
   :root {
-    /* Light palette (kept minimal; app defaults to dark via <html class="dark">) */
+    /* Light palette (kept default) */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -38,28 +37,26 @@
     --radius: 0.5rem;
   }
 
-  /* Default dark: near-black with green accents */
+  /* DARK MODE: black background, ALL text green */
   .dark {
-    --background: 0 0% 7%;
-    --foreground: 210 40% 98%;
-
+    --background: 0 0% 7%;               /* near-black */
+    --foreground: 142.1 70.6% 45.3%;     /* GREEN text everywhere */
     --card: 0 0% 9%;
-    --card-foreground: 210 40% 98%;
-
+    --card-foreground: 142.1 70.6% 45.3%;
     --popover: 0 0% 7%;
-    --popover-foreground: 210 40% 98%;
+    --popover-foreground: 142.1 70.6% 45.3%;
 
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 145 86% 10%;
+    --primary: 142.1 70.6% 45.3%;        /* brand green */
+    --primary-foreground: 0 0% 0%;       /* black/dark text on green surfaces */
 
     --secondary: 147 21% 14%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: 142.1 70.6% 45.3%;
 
     --muted: 147 21% 14%;
-    --muted-foreground: 217.9 10.6% 64.9%;
+    --muted-foreground: 142.1 45% 60%;
 
     --accent: 142.1 70.6% 45.3%;
-    --accent-foreground: 145 86% 10%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
@@ -69,11 +66,7 @@
     --ring: 142.1 70.6% 45.3%;
   }
 
-  /* Use CSS variables directly to avoid Tailwind utility resolution issues */
+  /* Use CSS vars directly to avoid custom utility lookups */
   * { border-color: hsl(var(--border)); }
   body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
-}
-@layer base {
-  a { color: hsl(var(--primary)); }
-  a:hover { color: hsl(var(--primary) / 0.9); }
 }
