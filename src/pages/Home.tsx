@@ -1,7 +1,7 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import AuctionCard from "@/components/AuctionCard";
+import AuctionCard from '../components/AuctionCard';
 import Footer from "@/components/Footer";
 
 export default function Index() {
@@ -64,7 +64,7 @@ export default function Index() {
 
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <AuctionCard id={1} title="Apple AirPods Pro (2nd Gen) with MagSafe Charging Case" />
-          <AuctionCard id={2} title="Samsung 27” 4K UHD Monitor (IPS, 60Hz) - 2024 Model" />
+          <AuctionCard id={2} title="Samsung 27â€ 4K UHD Monitor (IPS, 60Hz) - 2024 Model" />
           <AuctionCard id={3} title="Nintendo Switch OLED - White Joy-Con" />
         </div>
       </section>
@@ -73,3 +73,4 @@ export default function Index() {
     </div>
   );
 }
+
