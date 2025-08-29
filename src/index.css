@@ -4,17 +4,16 @@
 
 /* ----------
    Snaggle Theme Tokens (light + dark)
-   These drive Tailwind's hsl(var(--token)) colors in tailwind.config.ts
 ---------- */
 
 :root {
   --background: 0 0% 100%;
   --foreground: 222.2 47.4% 11.2%;
 
-  --primary: 142 72% 29%;      /* emerald-600 */
+  --primary: 142 72% 29%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 144 70% 18%;    /* darker emerald */
+  --secondary: 144 70% 18%;
   --secondary-foreground: 0 0% 100%;
 
   --muted: 215 16% 92%;
@@ -34,10 +33,10 @@
 }
 
 html.dark {
-  --background: 0 0% 0%;          /* near-black */
+  --background: 0 0% 0%;
   --foreground: 0 0% 100%;
 
-  --primary: 142 70% 45%;         /* neon-ish emerald for text/buttons */
+  --primary: 142 70% 45%;
   --primary-foreground: 0 0% 0%;
 
   --secondary: 144 65% 22%;
@@ -59,27 +58,14 @@ html.dark {
   --radius: 0.75rem;
 }
 
-/* ----------
-   Base layer tweaks
----------- */
 @layer base {
-  * {
-    @apply border-border;
-  }
-  html, body, #root {
-    height: 100%;
-  }
-  body {
-    @apply bg-background text-foreground antialiased;
-  }
-  h1,h2,h3,h4,h5,h6 {
-    @apply tracking-tight;
-  }
+  html, body, #root { height: 100%; }
+  body { @apply bg-background text-foreground antialiased; }
+  h1,h2,h3,h4,h5,h6 { @apply tracking-tight; }
+  /* Set default border color without adding a border width */
+  :where(*) { border-color: hsl(var(--border)); }
 }
 
-/* ----------
-   Utilities for the hero gradient and cards
----------- */
 @layer utilities {
   .snaggle-hero {
     background: radial-gradient(800px 400px at 20% 0%, hsl(var(--primary)/.15), transparent 70%);
@@ -90,9 +76,6 @@ html.dark {
   }
 }
 
-/* ----------
-   Component layer: buttons/links alignment
----------- */
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-base font-medium
@@ -103,7 +86,5 @@ html.dark {
     @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-base font-medium
            bg-transparent border border-white/20 hover:bg-white/10;
   }
-  .nav-link-active {
-    @apply text-[hsl(var(--primary))];
-  }
+  .nav-link-active { color: hsl(var(--primary)); }
 }
