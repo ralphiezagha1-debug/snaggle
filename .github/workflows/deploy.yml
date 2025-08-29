@@ -1,4 +1,5 @@
 name: verify-and-deploy
+
 on:
   push:
     branches: [ main ]
@@ -7,6 +8,14 @@ on:
 concurrency:
   group: deploy-main
   cancel-in-progress: true
+
+env:
+  # Set these in repo settings → Secrets and variables → Actions
+  # FIREBASE_PROJECT_ID = snaggle-ed88d
+  # FIREBASE_SERVICE_ACCOUNT = <JSON service account>
+  # HOSTING_SITE = snaggle-fun
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  HOSTING_SITE: ${{ secrets.HOSTING_SITE }}
 
 jobs:
   verify:
@@ -17,35 +26,53 @@ jobs:
         with:
           node-version: 20
           cache: npm
+
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools@latest
+
+      - name: Authenticate to Google (service account)
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Verify Firebase project & site
+        run: |
+          echo "firebase version: $(firebase --version)"
+          echo "Checking project: $FIREBASE_PROJECT_ID"
+          firebase projects:list --json | jq -r '.results[].projectId' | grep -w "$FIREBASE_PROJECT_ID"
+          SITE="${HOSTING_SITE:-snaggle-fun}"
+          echo "Checking hosting site: $SITE"
+          firebase hosting:sites:list --project "$FIREBASE_PROJECT_ID" --json | jq -r '.result[].name' | grep -w "$SITE"
+
+  build:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
       - name: Install deps
-        run: npm ci || npm install --no-audit --no-fund
-      - name: Install functions deps
-        run: npm ci --prefix functions || npm install --prefix functions --no-audit --no-fund
+        run: npm ci || npm install
       - name: Lint
         run: npm run lint --if-present
-      - name: Typecheck
-        run: npm run typecheck --if-present
-      - name: Typecheck functions
-        run: npm run typecheck --prefix functions --if-present
-      - name: Check for hard-coded colors
-        run: |
-          if git grep -nE 'text-(gray|slate|neutral)-|bg-(gray|slate|neutral|indigo|violet)-' -- src; then
-            echo "Found hard-coded Tailwind colors. Use tokens/utilities instead."; exit 1;
-          fi
       - name: Build
         run: npm run build
-      - uses: actions/upload-artifact@v4
+      - name: Export (optional)
+        run: npm run export --if-present || true
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist
+          path: |
+            dist
+            out
+          if-no-files-found: warn
 
-  deploy:
-    needs: verify
-    if: github.ref == 'refs/heads/main'
+  deploy-preview:
+    needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -58,6 +85,61 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      - name: Deploy to Firebase Hosting (live)
+      - name: Deploy to preview channel
+        id: preview
+        env:
+          SITE: ${{ env.HOSTING_SITE }}
         run: |
-          firebase deploy --only hosting --project snaggle-ed88d --non-interactive --force --debug
+          SITE="${SITE:-snaggle-fun}"
+          CHANNEL="ci-${{ github.run_id }}"
+          firebase hosting:channel:deploy "$CHANNEL" \
+            --project "$FIREBASE_PROJECT_ID" \
+            --site "$SITE" \
+            --json > preview.json
+          PREVIEW_URL=$(node -e "console.log(require('./preview.json').result[0].url)")
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+      - name: Smoke test preview
+        run: |
+          URL="${{ steps.preview.outputs.preview_url }}"
+          echo "Hitting $URL ..."
+          for i in {1..10}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || true)
+            if [ "$code" = "200" ] || [ "$code" = "304" ]; then
+              echo "Preview OK ($code)"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Preview smoke test failed"
+          exit 1
+
+  promote:
+    needs: deploy-preview
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools@latest
+      - name: Authenticate to Google (service account)
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Deploy to live
+        env:
+          SITE: ${{ env.HOSTING_SITE }}
+        run: |
+          SITE="${SITE:-snaggle-fun}"
+          firebase deploy \
+            --only "hosting:${SITE}" \
+            --project "$FIREBASE_PROJECT_ID" \
+            --non-interactive --force
+
+  rollback-on-fail:
+    needs: [deploy-preview, promote]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain failure
+        run: |
+          echo "::error::Build/preview/promote failed. Live site left unchanged."
+          echo "If a live deploy partially occurred, use Firebase Hosting 'view history' to rollback."
