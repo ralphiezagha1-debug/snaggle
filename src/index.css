@@ -66,6 +66,15 @@
 
 /* Utility tweaks for the Lovable look */
 @layer utilities {
-  .glow-ring { box-shadow: 0 0 0 2px hsl(var(--ring)/.35), 0 0 40px hsl(var(--primary)/.25); }
-  .soft-card { @apply rounded-xl border bg-card text-card-foreground; }
+  .glow-ring { 
+    box-shadow: 0 0 0 2px hsl(var(--ring)/.35), 0 0 40px hsl(var(--primary)/.25); 
+  }
+
+  /* Fixed: use raw CSS vars instead of @apply */
+  .soft-card {
+    border-radius: 0.75rem; /* rounded-xl */
+    border-width: 1px;
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
 }
