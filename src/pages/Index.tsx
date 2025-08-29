@@ -4,28 +4,26 @@ import { Button } from "@/components/ui/button";
 
 export default function Index() {
   return (
-    <div className="min-h-[calc(100vh-64px)]">
+    <div className="min-h-[calc(100vh-64px)] bg-background text-foreground">
       {/* HERO */}
-      <section className="relative mx-auto max-w-6xl px-6 py-16">
-        {/* Subtle green glow using CSS vars (CI-safe) */}
+      <section className="relative mx-auto max-w-6xl px-6 py-20">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(1200px 400px at 0% 0%, hsl(var(--primary) / 0.12), transparent 60%)",
+              "radial-gradient(800px 400px at 20% 0%, hsl(var(--primary)/.15), transparent 70%)",
           }}
         />
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
-          Welcome to <span className="text-primary">Snaggle</span>
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-primary">
+          Welcome to Snaggle
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-3xl">
+        <p className="mt-4 text-lg max-w-3xl text-muted-foreground">
           The ultimate penny auction experience. Bid smart, save big, and win
           amazing products at unbelievable prices. Every bid counts!
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
-          {/* PRIMARY CTA — brand green */}
           <Button
             size="lg"
             className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -33,8 +31,6 @@ export default function Index() {
           >
             <Link to="/live">Start Bidding Now</Link>
           </Button>
-
-          {/* SECONDARY CTA — outline */}
           <Button
             variant="outline"
             size="lg"
@@ -48,20 +44,20 @@ export default function Index() {
 
       {/* STATS */}
       <section className="mx-auto max-w-6xl px-6 pb-20 grid gap-6 md:grid-cols-3">
-        <div className="rounded-xl border bg-card p-6">
-          <div className="text-4xl font-bold">2,847</div>
+        <div className="rounded-xl border bg-card p-6 text-center">
+          <div className="text-4xl font-bold text-primary">2,847</div>
           <div className="mt-2 text-sm text-muted-foreground">
             Winners This Month
           </div>
         </div>
-        <div className="rounded-xl border bg-card p-6">
-          <div className="text-4xl font-bold">12,394</div>
+        <div className="rounded-xl border bg-card p-6 text-center">
+          <div className="text-4xl font-bold text-primary">12,394</div>
           <div className="mt-2 text-sm text-muted-foreground">
             Active Bidders
           </div>
         </div>
-        <div className="rounded-xl border bg-card p-6">
-          <div className="text-4xl font-bold">$2.4M</div>
+        <div className="rounded-xl border bg-card p-6 text-center">
+          <div className="text-4xl font-bold text-primary">$2.4M</div>
           <div className="mt-2 text-sm text-muted-foreground">
             Total Savings
           </div>

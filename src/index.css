@@ -2,10 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Brand tokens: black + white with green accents (CI-safe semantic variables) */
+/* ---- Snaggle brand tokens ---- */
 @layer base {
   :root {
-    /* Light (not primary for your site, kept reasonable) */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -13,7 +12,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Brand green accent (≈ emerald 600) */
+    /* Brand green */
     --primary: 142.1 70.6% 45.3%;
     --primary-foreground: 145 86% 10%;
 
@@ -33,33 +32,34 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 142.1 70.6% 45.3%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
-  /* Default to dark mode in your site: black bg, white text, green accents */
+  /* Default to dark theme: deep black + green accents */
   .dark {
-    --background: 0 0% 7%;          /* near-black */
-    --foreground: 210 40% 98%;      /* off-white text */
-    --card: 0 0% 9%;
-    --card-foreground: 210 40% 98%;
+    --background: 0 0% 0%;        /* pure black */
+    --foreground: 142 70% 60%;    /* glowing green text */
+    --card: 0 0% 7%;
+    --card-foreground: 142 70% 60%;
     --popover: 0 0% 7%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 142.1 70.6% 45.3%;   /* brand green */
+    --popover-foreground: 142 70% 60%;
+    --primary: 142.1 70.6% 45.3%;
     --primary-foreground: 0 0% 0%;
-    --secondary: 147 21% 14%;
+    --secondary: 142 40% 10%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 147 21% 14%;
-    --muted-foreground: 217.9 10.6% 64.9%;
+    --muted: 142 21% 14%;
+    --muted-foreground: 142 20% 65%;
     --accent: 142.1 70.6% 45.3%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 147 15% 18%;
-    --input: 147 15% 18%;
+    --border: 142 15% 18%;
+    --input: 142 15% 18%;
     --ring: 142.1 70.6% 45.3%;
   }
 
-  /* Apply tokens without @apply custom utilities */
-  * { border-color: hsl(var(--border)); }
-  body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
 }
