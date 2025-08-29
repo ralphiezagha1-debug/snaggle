@@ -60,9 +60,17 @@ html.dark {
 
 @layer base {
   html, body, #root { height: 100%; }
-  body { @apply bg-background text-foreground antialiased; }
+
+  /* Use raw CSS for theme colors */
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   h1,h2,h3,h4,h5,h6 { @apply tracking-tight; }
-  /* Set default border color without adding a border width */
+
   :where(*) { border-color: hsl(var(--border)); }
 }
 
@@ -71,20 +79,31 @@ html.dark {
     background: radial-gradient(800px 400px at 20% 0%, hsl(var(--primary)/.15), transparent 70%);
   }
   .snaggle-card {
-    @apply bg-black/40 border border-white/10 rounded-2xl shadow-lg;
+    @apply border rounded-2xl shadow-lg;
+    background-color: rgba(0,0,0,.4);
+    border-color: rgba(255,255,255,.1);
     backdrop-filter: blur(4px);
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-base font-medium
-           bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:opacity-90
-           focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))];
+    @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-base font-medium;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
   }
+  .btn-primary:hover { opacity: .9; }
+  .btn-primary:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-base font-medium
-           bg-transparent border border-white/20 hover:bg-white/10;
+    @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-base font-medium border;
+    background-color: transparent;
+    border-color: rgba(255,255,255,.2);
   }
+  .btn-ghost:hover { background-color: rgba(255,255,255,.1); }
+
   .nav-link-active { color: hsl(var(--primary)); }
 }
