@@ -29,7 +29,7 @@ const EmailCapture: React.FC<EmailCaptureProps> = ({ onSubmit }) => {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Enter your email"
         required
-        className="border border-gray-300 rounded px-3 py-2 w-64"
+        className="border border-border rounded px-3 py-2 w-64"
       />
       <button
         type="submit"
