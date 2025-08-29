@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---- Snaggle brand tokens ---- */
+/* ---- Snaggle brand tokens (black background + green glow) ---- */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -35,10 +35,10 @@
     --radius: 0.75rem;
   }
 
-  /* Default to dark theme: deep black + green accents */
+  /* Default dark theme */
   .dark {
-    --background: 0 0% 0%;        /* pure black */
-    --foreground: 142 70% 60%;    /* glowing green text */
+    --background: 0 0% 0%;
+    --foreground: 142 70% 60%;
     --card: 0 0% 7%;
     --card-foreground: 142 70% 60%;
     --popover: 0 0% 7%;
@@ -62,4 +62,10 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
+}
+
+/* Utility tweaks for the Lovable look */
+@layer utilities {
+  .glow-ring { box-shadow: 0 0 0 2px hsl(var(--ring)/.35), 0 0 40px hsl(var(--primary)/.25); }
+  .soft-card { @apply rounded-xl border bg-card text-card-foreground; }
 }

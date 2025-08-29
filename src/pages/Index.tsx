@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -12,7 +12,7 @@ export default function Index() {
           className="pointer-events-none absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(800px 400px at 20% 0%, hsl(var(--primary)/.15), transparent 70%)",
+              "radial-gradient(800px 400px at 20% 0%, hsl(var(--primary)/.16), transparent 70%)",
           }}
         />
         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-primary">
@@ -43,25 +43,43 @@ export default function Index() {
       </section>
 
       {/* STATS */}
-      <section className="mx-auto max-w-6xl px-6 pb-20 grid gap-6 md:grid-cols-3">
-        <div className="rounded-xl border bg-card p-6 text-center">
-          <div className="text-4xl font-bold text-primary">2,847</div>
-          <div className="mt-2 text-sm text-muted-foreground">
-            Winners This Month
+      <section className="mx-auto max-w-6xl px-6 pb-16 grid gap-6 md:grid-cols-3">
+        {[
+          { label: "Winners This Month", value: "2,847" },
+          { label: "Active Bidders", value: "12,394" },
+          { label: "Total Savings", value: "$2.4M" },
+        ].map((s) => (
+          <div key={s.label} className="soft-card p-6 text-center border">
+            <div className="text-4xl font-bold text-primary">{s.value}</div>
+            <div className="mt-2 text-sm text-muted-foreground">{s.label}</div>
           </div>
-        </div>
-        <div className="rounded-xl border bg-card p-6 text-center">
-          <div className="text-4xl font-bold text-primary">12,394</div>
-          <div className="mt-2 text-sm text-muted-foreground">
-            Active Bidders
+        ))}
+      </section>
+
+      {/* FEATURES (no navbar/footer required) */}
+      <section className="mx-auto max-w-6xl px-6 pb-24 grid gap-6 md:grid-cols-3">
+        {[
+          {
+            title: "Real-Time Auctions",
+            body:
+              "Lightning-fast bidding with transparent timers and fair-play rules.",
+          },
+          {
+            title: "Credits & Rewards",
+            body:
+              "Earn perks as you play—daily streaks, bonus credits, and VIP status.",
+          },
+          {
+            title: "Secure & Verified",
+            body:
+              "Built on modern infrastructure with strong auth and anti-bot protection.",
+          },
+        ].map((f) => (
+          <div key={f.title} className="soft-card p-6 border">
+            <h3 className="text-xl font-semibold text-primary">{f.title}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{f.body}</p>
           </div>
-        </div>
-        <div className="rounded-xl border bg-card p-6 text-center">
-          <div className="text-4xl font-bold text-primary">$2.4M</div>
-          <div className="mt-2 text-sm text-muted-foreground">
-            Total Savings
-          </div>
-        </div>
+        ))}
       </section>
     </div>
   );
