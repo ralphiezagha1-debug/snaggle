@@ -10,11 +10,18 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+
+    // ---- IMPORTANT: alias for "@/..." imports ----
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
+
     "types": ["vite/client"]
   },
-  "include": ["src", "vite.config.ts", "functions/src"]
+  "include": [
+    "src",
+    "vite.config.ts",
+    "functions/src"  // keep if you have Firebase Functions
+  ]
 }
