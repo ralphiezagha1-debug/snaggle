@@ -17,9 +17,9 @@ export default function AuctionCard({
   badge = "Live",
 }: Props) {
   return (
-    <div className="border rounded-xl bg-white/50 dark:bg-neutral-900/40 overflow-hidden">
+    <div className="border border-border rounded-xl bg-card text-card-foreground overflow-hidden">
       <Link to={`/listing/${id}`} className="block">
-        <div className="aspect-video w-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+        <div className="aspect-video w-full bg-muted flex items-center justify-center">
           {imageUrl ? (
             <img src={imageUrl} alt={title} className="h-full w-full object-cover" />
           ) : (
@@ -29,7 +29,7 @@ export default function AuctionCard({
       </Link>
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between text-xs opacity-70">
-          <span className="px-2 py-0.5 rounded-full border"> {badge} </span>
+          <span className="px-2 py-0.5 rounded-full border border-border"> {badge} </span>
           <span>Ends in {endsIn}</span>
         </div>
         <Link to={`/listing/${id}`} className="block">
@@ -43,3 +43,4 @@ export default function AuctionCard({
     </div>
   );
 }
+
