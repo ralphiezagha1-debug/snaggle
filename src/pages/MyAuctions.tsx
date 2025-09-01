@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Header } from "@/components/layout/Header";
+import Header from "@/components/Header";
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/platforms/firebase/app';
 import { loadBidApi } from '@/api';
@@ -90,3 +90,4 @@ const MyAuctions = () => {
 };
 
 export default MyAuctions;
+

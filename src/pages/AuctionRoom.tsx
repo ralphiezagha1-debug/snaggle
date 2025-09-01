@@ -16,7 +16,7 @@ import type { UserCredits } from '@/models/UserCredits';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/platforms/firebase/app';
 import { cn } from '@/lib/utils';
-import { Layout } from '@/components/Layout';
+import Layout from "@/components/Layout";
 
 const AuctionRoom = () => {
   const { id } = useParams<{ id: string }>();
@@ -293,3 +293,4 @@ const AuctionRoom = () => {
 };
 
 export default AuctionRoom;
+

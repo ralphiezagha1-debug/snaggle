@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Header } from "@/components/layout/Header";
+import Header from "@/components/Header";
 import { loadStripe } from '@stripe/stripe-js';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from '@/platforms/firebase/app';
@@ -73,3 +73,4 @@ const Credits = () => {
 };
 
 export default Credits;
+

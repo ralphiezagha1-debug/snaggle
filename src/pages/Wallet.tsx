@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Header } from "@/components/layout/Header";
+import Header from "@/components/Header";
 import { Link } from 'react-router-dom';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/platforms/firebase/app';
@@ -97,3 +97,4 @@ const Wallet = () => {
 };
 
 export default Wallet;
+
