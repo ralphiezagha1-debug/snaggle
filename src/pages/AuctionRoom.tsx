@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CountdownTimer } from '@/components/auction/CountdownTimer';
 import { BidButton } from '@/components/auction/BidButton';
 import { BidHistory } from '@/components/auction/BidHistory';
-import { Header } from '@/components/layout/Header';
+import { Header } from "@/components/layout/Header";
 import { Heart, Share2, Users, Zap, Trophy, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import macbookImage from '@/assets/macbook-hero.jpg';
