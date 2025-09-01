@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { CountdownTimer } from '@/components/auction/CountdownTimer';
 import { BidButton } from '@/components/auction/BidButton';
 import { BidHistory } from '@/components/auction/BidHistory';
-import { Header } from '@/components/layout/Header';
 import { Heart, Share2, Users, Zap, Trophy, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import macbookImage from '@/assets/macbook-hero.jpg';
@@ -14,10 +13,10 @@ import { loadBidApi } from '@/api';
 import type { Auction } from '@/models/Auction';
 import type { Bid } from '@/models/Bid';
 import type { UserCredits } from '@/models/UserCredits';
-import type { Unsubscribe } from '@/api/bidApi';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/platforms/firebase/app';
-
+import { cn } from '@/lib/utils';
+import { Layout } from '@/components/Layout';
 
 const AuctionRoom = () => {
   const { id } = useParams<{ id: string }>();
@@ -71,9 +70,11 @@ const AuctionRoom = () => {
 
   if (!auction) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p>Loading auction...</p>
-      </div>
+      <Layout>
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <p>Loading auction...</p>
+        </div>
+      </Layout>
     );
   }
 
@@ -127,19 +128,13 @@ const AuctionRoom = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header 
-        userCredits={userCredits?.balance ?? 0}
-        userName={currentUser?.displayName ?? "Guest"}
-        isAuthenticated={!!currentUser}
-      />
-      
+    <Layout>
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Auction Area */}
           <div className="lg:col-span-2 space-y-6">
             {/* Product Images */}
-            <Card>
+            <Card className="bg-card">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="relative">
@@ -149,7 +144,14 @@ const AuctionRoom = () => {
                       className="w-full h-96 object-cover rounded-lg"
                     />
                     <Badge 
-                      className={`absolute top-4 right-4 text-lg px-3 py-1`}
+                      className={cn(
+                        "absolute top-4 right-4 text-lg px-3 py-1",
+                        {
+                          "bg-primary text-primary-foreground": auction.status === 'open',
+                          "bg-secondary text-secondary-foreground": auction.status === 'scheduled',
+                          "bg-muted text-muted-foreground": auction.status === 'closed',
+                        }
+                      )}
                     >
                       {auction.status}
                     </Badge>
@@ -159,12 +161,12 @@ const AuctionRoom = () => {
             </Card>
 
             {/* Product Details */}
-            <Card>
+            <Card className="bg-card">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-2xl">{auction.title}</CardTitle>
-                    <p className="text-muted mt-2">{auction.description}</p>
+                    <p className="text-muted-foreground mt-2">{auction.description}</p>
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -173,7 +175,7 @@ const AuctionRoom = () => {
                       onClick={() => setIsWatchlisted(!isWatchlisted)}
                       className={isWatchlisted ? 'text-red-500' : ''}
                     >
-                      <Heart className={`w-4 h-4 mr-2 ${isWatchlisted ? 'fill-current' : ''}`} />
+                      <Heart className={cn("w-4 h-4 mr-2", { "fill-current": isWatchlisted })} />
                       Watch
                     </Button>
                     <Button variant="outline" size="sm">
@@ -186,11 +188,11 @@ const AuctionRoom = () => {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/20 rounded-lg">
                   <div className="text-center">
-                    <p className="text-sm text-muted">Participants</p>
+                    <p className="text-sm text-muted-foreground">Participants</p>
                     <p className="font-bold">{auction.participantCount || 0}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-sm text-muted">Total Bids</p>
+                    <p className="text-sm text-muted-foreground">Total Bids</p>
                     <p className="font-bold">{auction.bidCount || 0}</p>
                   </div>
                 </div>
@@ -201,21 +203,20 @@ const AuctionRoom = () => {
           {/* Auction Controls Sidebar */}
           <div className="space-y-6">
             {/* Current Price & Timer */}
-            <Card className="text-center">
+            <Card className="text-center bg-card">
               <CardHeader>
-                <CardTitle className="text-sm text-muted">CURRENT PRICE</CardTitle>
-                <div className="text-4xl font-bold text-accent">
+                <CardTitle className="text-sm text-muted-foreground">CURRENT PRICE</CardTitle>
+                <div className="text-4xl font-bold text-primary">
                   ${auction.currentPrice.toFixed(2)}
                 </div>
-                <p className="text-sm text-muted">
-                  Last bid by: <span className="font-medium text-fg">{auction.lastBidder || 'N/A'}</span>
+                <p className="text-sm text-muted-foreground">
+                  Last bid by: <span className="font-medium text-foreground">{auction.lastBidder || 'N/A'}</span>
                 </p>
               </CardHeader>
               <CardContent>
                 <CountdownTimer 
                   endTime={new Date(auction.endsAt || 0)}
                   onTimeUp={handleTimeUp}
-                  className="mb-4"
                 />
                 
                 {auction.status === 'open' ? (
@@ -236,7 +237,7 @@ const AuctionRoom = () => {
                         Complete Purchase
                       </Button>
                     ) : (
-                      <p className="text-muted">
+                      <p className="text-muted-foreground">
                         Won by {auction.lastBidder}
                       </p>
                     )}
@@ -246,7 +247,7 @@ const AuctionRoom = () => {
             </Card>
 
             {/* Quick Stats */}
-            <Card>
+            <Card className="bg-card">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Info className="w-5 h-5" />
@@ -255,11 +256,11 @@ const AuctionRoom = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-muted">Bids Remaining:</span>
-                  <span className="font-bold text-accent">{userCredits?.balance ?? 0}</span>
+                  <span className="text-muted-foreground">Bids Remaining:</span>
+                  <span className="font-bold text-primary">{userCredits?.balance ?? 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted">Your Bids Here:</span>
+                  <span className="text-muted-foreground">Your Bids Here:</span>
                   <span className="font-bold">
                     {(bids ?? []).filter(bid => bid.userId === currentUser?.uid).length}
                   </span>
@@ -287,9 +288,8 @@ const AuctionRoom = () => {
           <BidHistory bids={bids ?? []} currentUserId={currentUser?.uid} />
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
 export default AuctionRoom;
-

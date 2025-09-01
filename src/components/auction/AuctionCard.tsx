@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { CountdownTimer } from './CountdownTimer';
 import { Eye, Users, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
 
 interface AuctionCardProps {
   id: string;
