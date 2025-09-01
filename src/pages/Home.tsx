@@ -74,9 +74,9 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <AuctionCard id={1} title="Apple AirPods Pro (2nd Gen) with MagSafe Charging Case" />
-            <AuctionCard id={2} title="Samsung 27â€ 4K UHD Monitor (IPS, 60Hz) - 2024 Model" />
-            <AuctionCard id={3} title="Nintendo Switch OLED - White Joy-Con" />
+            <AuctionCard id="1" title="Apple AirPods Pro (2nd Gen) with MagSafe Charging Case" />
+            <AuctionCard id="2" title="Samsung 27â€ 4K UHD Monitor (IPS, 60Hz) - 2024 Model" />
+            <AuctionCard id="3" title="Nintendo Switch OLED - White Joy-Con" />
           </div>
         </div>
       </section>
