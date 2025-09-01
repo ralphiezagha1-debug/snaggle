@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,14 @@ import { loadBidApi } from '@/api';
 import type { Auction } from '@/models/Auction';
 import type { Bid } from '@/models/Bid';
 import type { UserCredits } from '@/models/UserCredits';
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+
+    param($m)
+    $line = $m.Groups[1].Value
+    # remove ", Unsubscribe" and "Unsubscribe, " inside that line only
+    $line = $line -replace ',\s*Unsubscribe',''
+    $line = $line -replace 'Unsubscribe\s*,\s*',''
+    return $line
+  
 import { app } from '@/platforms/firebase/app';
 import { cn } from '@/lib/utils';
 import Layout from "@/components/Layout";
@@ -45,8 +52,8 @@ const AuctionRoom = () => {
   useEffect(() => {
     if (!id) return;
 
-    let auctionUnsubscribe: Unsubscribe | undefined;
-    let bidsUnsubscribe: Unsubscribe | undefined;
+    let auctionUnsubscribe: (() => void) | undefined | undefined;
+    let bidsUnsubscribe: (() => void) | undefined | undefined;
 
     const setupListeners = async () => {
       const bidApi = await loadBidApi();
@@ -116,7 +123,7 @@ const AuctionRoom = () => {
     
     if (auction?.lastBidderId === currentUser?.uid) {
       toast({
-        title: "🎉 Congratulations! You Won!",
+        title: "ðŸŽ‰ Congratulations! You Won!",
         description: `You won the ${auction.title} for $${auction.currentPrice.toFixed(2)}!`,
       });
     } else if (auction) {
@@ -293,6 +300,8 @@ const AuctionRoom = () => {
 };
 
 export default AuctionRoom;
+
+
 
 
 
