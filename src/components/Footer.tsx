@@ -1,7 +1,7 @@
 import React from "react";
 import { Gavel } from 'lucide-react';
 
-export default function Footer() {
+export const Footer = () => {
   return (
     <footer className="border-t py-8 px-4">
       <div className="container mx-auto text-center text-muted-foreground">

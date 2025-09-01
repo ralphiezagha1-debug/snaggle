@@ -1,67 +1,12 @@
+@import './styles/theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ----------
-   Snaggle Theme Tokens (light + dark)
----------- */
-
-:root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 47.4% 11.2%;
-
-  --primary: 142 72% 29%;
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 144 70% 18%;
-  --secondary-foreground: 0 0% 100%;
-
-  --muted: 215 16% 92%;
-  --muted-foreground: 220 9% 46%;
-
-  --accent: 142 76% 36%;
-  --accent-foreground: 0 0% 100%;
-
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
-  --ring: 142 70% 45%;
-
-  --radius: 0.75rem;
-}
-
-html.dark {
-  --background: 0 0% 0%;
-  --foreground: 0 0% 100%;
-
-  --primary: 142 70% 45%;
-  --primary-foreground: 0 0% 0%;
-
-  --secondary: 144 65% 22%;
-  --secondary-foreground: 0 0% 100%;
-
-  --muted: 240 5% 12%;
-  --muted-foreground: 0 0% 70%;
-
-  --accent: 142 70% 45%;
-  --accent-foreground: 0 0% 0%;
-
-  --destructive: 0 72% 42%;
-  --destructive-foreground: 0 0% 100%;
-
-  --border: 240 5% 20%;
-  --input: 240 5% 20%;
-  --ring: 142 70% 45%;
-
-  --radius: 0.75rem;
-}
-
 @layer base {
   html, body, #root { height: 100%; }
 
-  /* Use raw CSS for theme colors */
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
@@ -69,42 +14,5 @@ html.dark {
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1,h2,h3,h4,h5,h6 { @apply tracking-tight; }
-
   :where(*) { border-color: hsl(var(--border)); }
 }
-
-@layer utilities {
-  .snaggle-hero {
-    background: radial-gradient(800px 400px at 20% 0%, hsl(var(--primary)/.15), transparent 70%);
-  }
-  .snaggle-card {
-    @apply border rounded-2xl shadow-lg;
-    background-color: rgba(0,0,0,.4);
-    border-color: rgba(255,255,255,.1);
-    backdrop-filter: blur(4px);
-  }
-}
-
-@layer components {
-  .btn-primary {
-    @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-base font-medium;
-    background-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-  }
-  .btn-primary:hover { opacity: .9; }
-  .btn-primary:focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
-  }
-
-  .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-base font-medium border;
-    background-color: transparent;
-    border-color: rgba(255,255,255,.2);
-  }
-  .btn-ghost:hover { background-color: rgba(255,255,255,.1); }
-
-  .nav-link-active { color: hsl(var(--primary)); }
-}
-@import './styles/theme.css';

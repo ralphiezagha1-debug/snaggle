@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuctionCard } from '@/components/auction/AuctionCard';
-import Footer from "@/components/Footer";
+import { Footer } from "@/components/Footer";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Gavel, Zap, Trophy, Clock, Users, Star } from 'lucide-react';
 
@@ -11,12 +11,12 @@ export default function Index() {
     <div className="min-h-[calc(100vh-64px)] bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative py-20 px-4 text-center overflow-hidden">
-        <div className="absolute inset-0 gradient-primary opacity-10"></div>
+        <div className="absolute inset-0" style={{background: 'radial-gradient(800px 400px at 20% 0%, hsl(var(--primary)/.15), transparent 70%)'}}></div>
         <div className="container mx-auto relative z-10">
           <div className="flex items-center justify-center gap-3 mb-6">
             <Gavel className="w-12 h-12 text-primary" />
             <h1 className="text-5xl md:text-6xl font-bold">
-              Welcome to <span className="gradient-primary bg-clip-text text-transparent">Snaggle</span>
+              Welcome to <span className="text-primary">Snaggle</span>
             </h1>
           </div>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -25,7 +25,7 @@ export default function Index() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button size="lg" className="gradient-primary shadow-glow text-lg px-8">
+            <Button size="lg" className="bg-primary text-primary-foreground shadow-lg text-lg px-8">
               <Zap className="w-5 h-5 mr-2" />
               Start Bidding Now
             </Button>
@@ -37,24 +37,24 @@ export default function Index() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <Card className="text-center">
+            <Card className="text-center bg-card">
               <CardHeader>
-                <Trophy className="w-8 h-8 text-auction-gold mx-auto mb-2" />
-                <CardTitle className="text-2xl font-bold text-auction-gold">2,847</CardTitle>
+                <Trophy className="w-8 h-8 text-primary mx-auto mb-2" />
+                <CardTitle className="text-2xl font-bold text-primary">2,847</CardTitle>
                 <p className="text-muted-foreground">Winners This Month</p>
               </CardHeader>
             </Card>
-            <Card className="text-center">
+            <Card className="text-center bg-card">
               <CardHeader>
                 <Users className="w-8 h-8 text-primary mx-auto mb-2" />
                 <CardTitle className="text-2xl font-bold text-primary">12,394</CardTitle>
                 <p className="text-muted-foreground">Active Bidders</p>
               </CardHeader>
             </Card>
-            <Card className="text-center">
+            <Card className="text-center bg-card">
               <CardHeader>
-                <Star className="w-8 h-8 text-auction-success mx-auto mb-2" />
-                <CardTitle className="text-2xl font-bold text-auction-success">$2.4M</CardTitle>
+                <Star className="w-8 h-8 text-primary mx-auto mb-2" />
+                <CardTitle className="text-2xl font-bold text-primary">$2.4M</CardTitle>
                 <p className="text-muted-foreground">Total Savings</p>
               </CardHeader>
             </Card>

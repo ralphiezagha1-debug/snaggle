@@ -4,18 +4,17 @@ import { Button } from '@/components/ui/button';
 import { CountdownTimer } from './CountdownTimer';
 import { Eye, Users, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
 
 interface AuctionCardProps {
-  id: string | number;
+  id: string;
   title: string;
-  image?: string;
-  currentPrice?: number;
-  msrp?: number;
-  endTime?: Date;
-  status?: 'LIVE' | 'SCHEDULED' | 'ENDED';
-  bidCount?: number;
-  participantCount?: number;
+  image: string;
+  currentPrice: number;
+  msrp: number;
+  endTime: Date;
+  status: 'LIVE' | 'SCHEDULED' | 'ENDED';
+  bidCount: number;
+  participantCount: number;
   lastBidder?: string;
   className?: string;
 }
@@ -24,18 +23,18 @@ export const AuctionCard = ({
   id,
   title,
   image,
-  currentPrice = 0.01,
-  msrp = 0,
-  endTime = new Date(Date.now() + 3600 * 1000),
-  status = 'LIVE',
-  bidCount = 0,
-  participantCount = 0,
+  currentPrice,
+  msrp,
+  endTime,
+  status,
+  bidCount,
+  participantCount,
   lastBidder,
   className
 }: AuctionCardProps) => {
   const navigate = useNavigate();
   const savings = msrp - (currentPrice * 100);
-  const savingsPercent = msrp > 0 ? Math.round((savings / msrp) * 100) : 0;
+  const savingsPercent = Math.round((savings / msrp) * 100);
 
   const handleViewAuction = () => {
     navigate(`/auction/${id}`);
@@ -97,7 +96,7 @@ export const AuctionCard = ({
                 Save {savingsPercent}%
               </p>
               <p className="text-xs text-muted-foreground">
-                ${(savings / 100).toFixed(2)} off
+                ${savings.toFixed(0)} off
               </p>
             </div>
           </div>
