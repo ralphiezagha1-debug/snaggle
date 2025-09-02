@@ -19,7 +19,8 @@ html, body, #root {
 
 
 @layer base {
-  * { @apply border-border; }
+  *,::before,::after{border-color:hsl(var(--border));}
   body { @apply bg-background text-foreground; }
 }
+
 
