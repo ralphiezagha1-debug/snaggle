@@ -1,13 +1,17 @@
+// firestore.rules
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Landing page waitlist: allow create only
+    
+    // ✅ Public waitlist collection
     match /waitlist/{docId} {
+      // Anyone can add a new document
       allow create: if true;
+      // No one can read or modify existing docs
       allow read, update, delete: if false;
     }
 
-    // Everything else locked down
+    // ❌ Default: everything else is blocked unless explicitly allowed
     match /{document=**} {
       allow read, write: if false;
     }

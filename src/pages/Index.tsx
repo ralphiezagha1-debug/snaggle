@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import EmailSignUp from "@/components/marketing/EmailSignUp";
 
 export default function Index() {
   return (
@@ -56,7 +57,7 @@ export default function Index() {
         ))}
       </section>
 
-      {/* FEATURES (no navbar/footer required) */}
+      {/* FEATURES */}
       <section className="mx-auto max-w-6xl px-6 pb-24 grid gap-6 md:grid-cols-3">
         {[
           {
@@ -80,6 +81,45 @@ export default function Index() {
             <p className="mt-2 text-sm text-muted-foreground">{f.body}</p>
           </div>
         ))}
+      </section>
+
+      {/* FINAL CTA + EMAIL SIGNUP */}
+      <section className="mx-auto max-w-6xl px-6 pb-24">
+        <div className="grid gap-10 md:grid-cols-2 items-center">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary">
+              Be first in line for the big daily auction.
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Join the waitlist for launch updates and exclusive credit bonuses.
+              No spam—just the good stuff.
+            </p>
+            <div className="mt-6">
+              <EmailSignUp />
+            </div>
+            <div className="mt-4 text-xs text-muted-foreground">
+              By subscribing you agree to receive occasional emails from Snaggle.
+              Unsubscribe anytime.
+            </div>
+          </div>
+
+          <div className="rounded-2xl border bg-card/60 p-6 backdrop-blur-sm">
+            <div className="text-sm uppercase tracking-wide text-muted-foreground">
+              What people say
+            </div>
+            <div className="mt-4 space-y-4">
+              {[
+                "“Super fun format. The countdown adds real excitement.”",
+                "“Got a pair of headphones for less than lunch.”",
+                "“UI looks great on mobile—timers feel fair.”",
+              ].map((q, i) => (
+                <div key={i} className="text-sm">
+                  {q}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );
