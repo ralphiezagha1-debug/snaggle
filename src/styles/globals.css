@@ -1,3 +1,4 @@
+﻿@import "./theme.css";
 @import './theme.css';
 
 @tailwind base;
@@ -15,3 +16,4 @@ html, body, #root {
   padding-left: 1rem;
   padding-right: 1rem;
 }
+

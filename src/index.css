@@ -1,3 +1,4 @@
+﻿@import "./theme.css";
 @import './styles/theme.css';
 
 @tailwind base;
@@ -16,3 +17,4 @@
 
   :where(*) { border-color: hsl(var(--border)); }
 }
+
