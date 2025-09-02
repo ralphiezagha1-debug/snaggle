@@ -22,3 +22,6 @@ __archive_backup_ui__/
 
 _git_rescue_*
 
+# Editor/backup artifacts
+*.bak
+*.bak-*
