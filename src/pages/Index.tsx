@@ -5,7 +5,7 @@ import EmailSignUp from "@/components/marketing/EmailSignUp";
 
 export default function Index() {
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-background text-foreground">
+    <div className="min-h-[calc(100vh-64px)] text-foreground">
       {/* HERO */}
       <section className="relative mx-auto max-w-6xl px-6 py-20">
         <div

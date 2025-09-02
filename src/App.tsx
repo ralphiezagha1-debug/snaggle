@@ -13,7 +13,13 @@ import { Footer } from "@/components/Footer";
 
 function Frame() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div
+      className="min-h-screen flex flex-col text-foreground"
+      style={{
+        background:
+          "radial-gradient(1000px 600px at 30% 0%, hsl(var(--primary)/0.15), transparent 70%), black",
+      }}
+    >
       <Navbar />
       <main className="flex-1">
         <Outlet />
