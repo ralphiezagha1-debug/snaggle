@@ -42,7 +42,9 @@ jobs:
         if: github.ref == 'refs/heads/main' && success()
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
+      firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_SNAGGLE }}"
           channelId: live
           projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
+
