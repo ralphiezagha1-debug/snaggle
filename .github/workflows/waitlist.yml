@@ -1,4 +1,4 @@
-name: Waitlist Flow
+﻿name: Waitlist Flow
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run E2E test
-        run: npx playwright test ./e2e/waitlist.spec.ts
+        run: npx playwright test -c playwright.config.ts
         continue-on-error: true
 
       - name: Upload Playwright report on failure
