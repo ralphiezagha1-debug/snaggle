@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { db } from "@/lib/firebase"; // <-- make sure this is your Firestore export
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { joinWaitlist } from "@/lib/api";
 
 export default function EmailSignUp() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<null | { type: "ok" | "err"; text: string }>(
-    null
-  );
+  const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -24,45 +21,35 @@ export default function EmailSignUp() {
 
     try {
       setBusy(true);
-      await addDoc(collection(db, "waitlist"), {
-        email: trimmed,
-        createdAt: serverTimestamp(),
-        source: "landing",
-      });
+      await joinWaitlist(trimmed);
       setMsg({ type: "ok", text: "You're on the list! 🎉" });
       setEmail("");
-    } catch (err: any) {
-      setMsg({
-        type: "err",
-        text:
-          err?.code === "permission-denied"
-            ? "Writes are blocked by Firestore rules."
-            : "Something went wrong. Please try again.",
-      });
+    } catch (err) {
+      setMsg({ type: "err", text: "Couldn’t join. Please try again." });
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full max-w-md gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 items-start">
       <Input
-        type="email"
-        placeholder="you@example.com"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e: any) => setEmail(e.target.value)}
         disabled={busy}
-        className="rounded-2xl"
+        className="rounded-2xl w-full sm:w-auto"
+        placeholder="you@example.com"
         aria-label="Email address"
+        type="email"
+        required
       />
       <Button type="submit" disabled={busy} className="rounded-2xl">
         {busy ? "Joining..." : "Join waitlist"}
       </Button>
       {msg && (
         <div
-          className={`w-full text-sm mt-2 ${
-            msg.type === "ok" ? "text-green-500" : "text-red-500"
-          }`}
+          role="status"
+          className={msg.type === "ok" ? "text-green-400 text-sm" : "text-red-400 text-sm"}
         >
           {msg.text}
         </div>
