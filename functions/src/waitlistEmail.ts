@@ -1,26 +1,37 @@
-﻿/** Waitlist email builder (Cloud Functions / Node) */
-export interface WaitlistEmailInput { to: string; from?: string; subject?: string; }
-export interface MailPayload { to: string; from: string; subject: string; text: string; html: string; }
+﻿import sgMail from "@sendgrid/mail";
 
-const DEFAULT_FROM = process.env.MAIL_FROM || "no-reply@snaggle.fun";
-const DEFAULT_SUBJECT = "Welcome to the Snaggle waitlist";
+/**
+ * Sends both the user confirmation and the admin notification emails.
+ */
+export async function sendWaitlistEmails(
+  apiKey: string,
+  from: string,
+  adminTo: string,
+  userEmail: string
+): Promise<void> {
+  sgMail.setApiKey(apiKey);
 
-export function buildWaitlistEmail(input: WaitlistEmailInput): MailPayload {
-  const to = input.to.trim();
-  const from = (input.from || DEFAULT_FROM).trim();
-  const subject = input.subject || DEFAULT_SUBJECT;
+  // User confirmation
+  await sgMail.send({
+    to: userEmail,
+    from,
+    subject: "You’re on the Snaggle waitlist 🎉",
+    text:
+      "Thanks for joining the Snaggle waitlist! We’ll email you with early access and launch updates.",
+    html: `
+      <div style="font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5">
+        <h2>Welcome to <span style="color:#16ff00">Snaggle</span> 🎉</h2>
+        <p>Thanks for joining the waitlist! We’ll email you with early access and launch updates.</p>
+      </div>
+    `,
+  });
 
-  const text =
-    "Thanks for joining the Snaggle waitlist!\n\n" +
-    "We'll email you when your spot is ready.\n\n" +
-    "- Team Snaggle";
-
-  const html =
-    '<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5">' +
-    '<h2>Thanks for joining the Snaggle waitlist</h2>' +
-    "<p>We'll email you when your spot is ready.</p>" +
-    "<p>- Team Snaggle</p>" +
-    "</div>";
-
-  return { to, from, subject, text, html };
+  // Admin notification
+  await sgMail.send({
+    to: adminTo,
+    from,
+    subject: "New waitlist signup",
+    text: `New waitlist email: ${userEmail}`,
+    html: `<p>New waitlist signup: <strong>${userEmail}</strong></p>`,
+  });
 }
