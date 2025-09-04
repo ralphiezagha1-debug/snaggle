@@ -1,59 +1,60 @@
 import React, { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { joinWaitlist } from "@/lib/api";
 
 export default function EmailSignUp() {
   const [email, setEmail] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setMsg(null);
+    setError(null);
 
     const trimmed = email.trim().toLowerCase();
-    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
-    if (!valid) {
-      setMsg({ type: "err", text: "Please enter a valid email." });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setError("Please enter a valid email address.");
       return;
     }
 
+    setLoading(true);
     try {
-      setBusy(true);
       await joinWaitlist(trimmed);
-      setMsg({ type: "ok", text: "You're on the list! 🎉" });
+      toast.success("You're on the list!", {
+        description: "We'll notify you at launch. Thanks for your interest!",
+      });
       setEmail("");
-    } catch (err) {
-      setMsg({ type: "err", text: "Couldn’t join. Please try again." });
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred. Please try again.");
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 items-start">
-      <Input
-        value={email}
-        onChange={(e: any) => setEmail(e.target.value)}
-        disabled={busy}
-        className="rounded-2xl w-full sm:w-auto"
-        placeholder="you@example.com"
-        aria-label="Email address"
-        type="email"
-        required
-      />
-      <Button type="submit" disabled={busy} className="rounded-2xl">
-        {busy ? "Joining..." : "Join waitlist"}
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 items-start w-full">
+      <div className="relative flex-1 w-full">
+        <Input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
+          className="w-full"
+          placeholder="you@example.com"
+          aria-label="Email address"
+          type="email"
+          required
+        />
+        {error && (
+          <p className="absolute -bottom-5 left-0 text-xs text-red-400">
+            {error}
+          </p>
+        )}
+      </div>
+      <Button type="submit" disabled={loading} className="font-semibold">
+        {loading ? "Joining..." : "Join Waitlist"}
       </Button>
-      {msg && (
-        <div
-          role="status"
-          className={msg.type === "ok" ? "text-green-400 text-sm" : "text-red-400 text-sm"}
-        >
-          {msg.text}
-        </div>
-      )}
     </form>
   );
 }
