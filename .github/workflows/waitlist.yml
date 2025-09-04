@@ -1,5 +1,4 @@
 ﻿name: ci
-
 on:
   push:
     branches: [ main ]
@@ -13,9 +12,12 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci || npm install
-      - run: npm run typecheck --if-present
-      - run: npm run build
+      - name: Install deps
+        run: npm ci || npm install
+      - name: Typecheck (root)
+        run: npm run typecheck --if-present
+      - name: Build (root)
+        run: npm run build
 
   deploy:
     needs: verify
@@ -23,7 +25,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install deps
+        run: npm ci || npm install
+      - name: Build (root)
+        run: npm run build
+      - name: Show dist
+        run: ls -la && test -d dist && ls -la dist
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
