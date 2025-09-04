@@ -1,9 +1,6 @@
-// Gen 2 entrypoint: keep this tiny and re-export functions.
 import { onRequest } from "firebase-functions/v2/https";
 
-export const health = onRequest((req, res) => {
-  res.status(200).send("ok");
-});
+export const health = onRequest((_, res) => res.status(200).send("ok"));
 
-// Re-export your waitlist handler (named exactly as the Hosting rewrite expects)
+// Re-export joinWaitlist so Hosting can find it
 export { joinWaitlist } from "./waitlist";
