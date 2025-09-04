@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Outlet } from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner";
 
 // PAGES (keep Home/ListingDetail so nothing breaks)
 import Home from "@/pages/Home";
@@ -13,18 +14,13 @@ import { Footer } from "@/components/Footer";
 
 function Frame() {
   return (
-    <div
-      className="min-h-screen flex flex-col text-foreground"
-      style={{
-        background:
-          "radial-gradient(1000px 600px at 30% 0%, hsl(var(--primary)/0.15), transparent 70%), black",
-      }}
-    >
+    <div className="min-h-screen flex flex-col text-foreground bg-background">
       <Navbar />
       <main className="flex-1">
         <Outlet />
       </main>
       <Footer />
+      <Toaster />
     </div>
   );
 }
