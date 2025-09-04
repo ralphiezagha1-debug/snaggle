@@ -6,53 +6,42 @@ import cors from "cors";
 import { getFirestore } from "firebase-admin/firestore";
 import { getApp, getApps, initializeApp } from "firebase-admin/app";
 import sgMail from "@sendgrid/mail";
-import { getSecret } from "firebase-functions/params";
+import { defineSecret } from "firebase-functions/params";
 
-// Initialize firebase-admin (idempotent)
+// Init firebase-admin once
 getApps().length ? getApp() : initializeApp();
 
-const SENDGRID_API_KEY = getSecret("SENDGRID_API_KEY");
-const MAIL_FROM = getSecret("MAIL_FROM");
-const MAIL_ADMIN = getSecret("MAIL_ADMIN");
+// Secrets
+const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
+const MAIL_FROM        = defineSecret("MAIL_FROM");
+const MAIL_ADMIN       = defineSecret("MAIL_ADMIN");
 
-sgMail.setApiKey(SENDGRID_API_KEY.value());
-
+// Email regex
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Express app
 const app = express();
 
-// --- Middleware ---
-app.use(
-  cors({
-    origin: ["https://snaggle.fun", "http://localhost:5173"],
-  })
-);
+// CORS + JSON + rate limit
+app.use(cors({ origin: ["https://snaggle.fun", "http://localhost:5173"] }));
 app.use(express.json());
+app.use(rateLimit({ windowMs: 60_000, max: 5, standardHeaders: true, legacyHeaders: false }));
 
-const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use(limiter);
-
-// --- Endpoint ---
+// Routes
 app.post("/api/waitlist", async (req, res) => {
   const { email } = req.body ?? {};
-
   if (typeof email !== "string" || !EMAIL_RE.test(email)) {
     return res.status(400).json({ ok: false, error: "Invalid email" });
   }
 
   try {
-    const db = getFirestore();
-    await db.collection("waitlist").add({
-      email,
-      createdAt: new Date(),
-    });
+    // Configure SendGrid per-request (secret access happens at runtime)
+    sgMail.setApiKey(SENDGRID_API_KEY.value());
 
-    // Confirmation email to user
+    const db = getFirestore();
+    await db.collection("waitlist").add({ email, createdAt: new Date() });
+
+    // User confirmation
     await sgMail.send({
       to: email,
       from: MAIL_FROM.value(),
@@ -60,7 +49,7 @@ app.post("/api/waitlist", async (req, res) => {
       text: "Thanks for joining our waitlist. You’re on the list!",
     });
 
-    // Notification email to admin
+    // Admin notification
     await sgMail.send({
       to: MAIL_ADMIN.value(),
       from: MAIL_FROM.value(),
@@ -70,12 +59,16 @@ app.post("/api/waitlist", async (req, res) => {
 
     return res.json({ ok: true });
   } catch (err) {
-    logger.error("Error in waitlist signup:", err as Error);
+    logger.error("Waitlist error", err as Error);
     return res.status(500).json({ ok: false, error: "Server error" });
   }
 });
 
-// Health check
+// Health
 app.get("/health", (_req, res) => res.status(200).send("ok"));
 
-export const waitlist = onRequest(app);
+// Export with secrets so Functions can mount them
+export const waitlist = onRequest(
+  { secrets: [SENDGRID_API_KEY, MAIL_FROM, MAIL_ADMIN] },
+  (req, res) => app(req, res)
+);
