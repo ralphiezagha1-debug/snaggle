@@ -15,7 +15,7 @@ export interface MailPayload {
   html: string;
 }
 
-const DEFAULT_FROM = process.env.MAIL_FROM || "no-reply@snaggle.fun";
+const DEFAULT_FROM = (import.meta as any).env?.VITE_MAIL_FROM ?? "no-reply@snaggle.fun";
 const DEFAULT_SUBJECT = "Welcome to the Snaggle waitlist 🎉";
 
 export function buildWaitlistEmail(input: WaitlistEmailInput): MailPayload {
