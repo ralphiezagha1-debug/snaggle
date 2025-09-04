@@ -1,160 +1,75 @@
-import express from "express";
-import cors from "cors";
-import rateLimit from "express-rate-limit";
 import { onRequest } from "firebase-functions/v2/https";
-import { defineSecret } from "firebase-functions/params";
-import * as admin from "firebase-admin";
-import { Timestamp } from "firebase-admin/firestore";
-import { configureSendgrid, sendAdminNotification, sendUserConfirmation } from "./lib/mailer";
+import * as logger from "firebase-functions/logger";
+import express from "express";
+import rateLimit from "express-rate-limit";
+import cors from "cors";
+import { getFirestore } from "firebase-admin/firestore";
+import sgMail from "@sendgrid/mail";
+import { getSecret } from "firebase-functions/params";
 
-// Initialize Admin SDK once
-try {
-  admin.app();
-} catch {
-  admin.initializeApp();
-}
+const SENDGRID_API_KEY = getSecret("SENDGRID_API_KEY");
+const MAIL_FROM = getSecret("MAIL_FROM");
+const MAIL_ADMIN = getSecret("MAIL_ADMIN");
 
-// Secrets (must be set via `firebase functions:secrets:set`)
-const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
-const MAIL_FROM = defineSecret("MAIL_FROM");
-const MAIL_ADMIN = defineSecret("MAIL_ADMIN");
+sgMail.setApiKey(SENDGRID_API_KEY.value());
 
-// Allowed origins for CORS
-const ALLOWED_ORIGINS = new Set(["https://snaggle.fun", "http://localhost:5173"]);
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Simple RFC 5322-ish email regex (pragmatic)
-const EMAIL_RE = new RegExp('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+
-
-// Express app for middleware (CORS + rate limit)
 const app = express();
-app.use(express.json());
 
+// --- Middleware ---
 app.use(
   cors({
-    origin: (origin, cb) => {
-      if (!origin || ALLOWED_ORIGINS.has(origin)) return cb(null, true);
-      return cb(new Error("CORS: origin not allowed"));
-    },
-    methods: ["POST", "OPTIONS"],
+    origin: ["https://snaggle.fun", "http://localhost:5173"],
   })
 );
+app.use(express.json());
 
-// Basic rate limit: 5 requests / 60s per IP
-app.use(
-  rateLimit({
-    windowMs: 60 * 1000,
-    limit: 5,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { ok: false, error: "Too many requests, try again later." },
-  })
-);
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+});
+app.use(limiter);
 
-app.options("/api/waitlist", (_req, res) => res.sendStatus(204));
-
+// --- Endpoint ---
 app.post("/api/waitlist", async (req, res) => {
-  const email: unknown = req.body?.email;
-  if (typeof email !== "string" || !EMAIL_RE.test(email)) {
+  const { email } = req.body;
+
+  if (!email || !EMAIL_RE.test(email)) {
     return res.status(400).json({ ok: false, error: "Invalid email" });
   }
 
-  // Configure SendGrid using secrets injected by Functions
-  const apiKey = process.env.SENDGRID_API_KEY;
-  const from = process.env.MAIL_FROM;
-  const adminTo = process.env.MAIL_ADMIN;
-  if (!apiKey || !from || !adminTo) {
-    return res.status(500).json({ ok: false, error: "Missing mail configuration" });
-  }
-  configureSendgrid(apiKey);
-
-  // Save to Firestore
-  const db = admin.firestore();
-  await db.collection("waitlist").add({ email, createdAt: Timestamp.now() });
-
-  // Send emails (best-effort; if one fails we still attempt the other)
   try {
-    await sendUserConfirmation(from, email);
-  } catch (e) {
-    console.error("sendUserConfirmation failed", e);
-  }
-  try {
-    await sendAdminNotification(from, adminTo, email);
-  } catch (e) {
-    console.error("sendAdminNotification failed", e);
-  }
+    const db = getFirestore();
+    await db.collection("waitlist").add({
+      email,
+      createdAt: new Date(),
+    });
 
-  return res.status(200).json({ ok: true });
+    // Confirmation email to user
+    await sgMail.send({
+      to: email,
+      from: MAIL_FROM.value(),
+      subject: "Welcome to Snaggle!",
+      text: "Thanks for joining our waitlist. You’re on the list!",
+    });
+
+    // Notification email to admin
+    await sgMail.send({
+      to: MAIL_ADMIN.value(),
+      from: MAIL_FROM.value(),
+      subject: "New Waitlist Signup",
+      text: `New signup: ${email}`,
+    });
+
+    return res.json({ ok: true });
+  } catch (err) {
+    logger.error("Error in waitlist signup:", err);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
 });
 
-export const waitlist = onRequest(
-  { secrets: [SENDGRID_API_KEY, MAIL_FROM, MAIL_ADMIN], region: "us-central1" },
-  app
-);
-);
+// Health check
+app.get("/health", (_req, res) => res.status(200).send("ok"));
 
-// Express app for middleware (CORS + rate limit)
-const app = express();
-app.use(express.json());
-
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (!origin || ALLOWED_ORIGINS.has(origin)) return cb(null, true);
-      return cb(new Error("CORS: origin not allowed"));
-    },
-    methods: ["POST", "OPTIONS"],
-  })
-);
-
-// Basic rate limit: 5 requests / 60s per IP
-app.use(
-  rateLimit({
-    windowMs: 60 * 1000,
-    limit: 5,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { ok: false, error: "Too many requests, try again later." },
-  })
-);
-
-app.options("/api/waitlist", (_req, res) => res.sendStatus(204));
-
-app.post("/api/waitlist", async (req, res) => {
-  const email: unknown = req.body?.email;
-  if (typeof email !== "string" || !EMAIL_RE.test(email)) {
-    return res.status(400).json({ ok: false, error: "Invalid email" });
-  }
-
-  // Configure SendGrid using secrets injected by Functions
-  const apiKey = process.env.SENDGRID_API_KEY;
-  const from = process.env.MAIL_FROM;
-  const adminTo = process.env.MAIL_ADMIN;
-  if (!apiKey || !from || !adminTo) {
-    return res.status(500).json({ ok: false, error: "Missing mail configuration" });
-  }
-  configureSendgrid(apiKey);
-
-  // Save to Firestore
-  const db = admin.firestore();
-  await db.collection("waitlist").add({ email, createdAt: Timestamp.now() });
-
-  // Send emails (best-effort; if one fails we still attempt the other)
-  try {
-    await sendUserConfirmation(from, email);
-  } catch (e) {
-    console.error("sendUserConfirmation failed", e);
-  }
-  try {
-    await sendAdminNotification(from, adminTo, email);
-  } catch (e) {
-    console.error("sendAdminNotification failed", e);
-  }
-
-  return res.status(200).json({ ok: true });
-});
-
-export const waitlist = onRequest(
-  { secrets: [SENDGRID_API_KEY, MAIL_FROM, MAIL_ADMIN], region: "us-central1" },
-  app
-);
-
+export const waitlist = onRequest(app);
