@@ -1,101 +1,81 @@
-﻿import { onRequest } from "firebase-functions/v2/https";
-import express, { Request, Response } from "express";
+import { onRequest } from "firebase-functions/v2/https";
+import { defineSecret } from "firebase-functions/params";
+import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import { initializeApp } from "firebase-admin/app";
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
-import sg from "@sendgrid/mail";
-import { defineSecret } from "firebase-functions/params";
+import { getFirestore } from "firebase-admin/firestore";
+import { getApps, initializeApp } from "firebase-admin/app";
+import { sendWaitlistEmails } from "./waitlistEmail";
 
-// --- init (safe at import time) ---
-initializeApp();
-const db = getFirestore();
+// Import callable and other HTTP functions
+export { placeBid } from "./placeBid";
+export { createCheckoutSession } from "./createCheckoutSession";
+export { stripeWebhook } from "./stripeWebhook";
+export { sendTestMail } from "./mail";
 
-// Secrets
+// Secrets required for sending waitlist emails
 const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
-const MAIL_FROM = process.env.MAIL_FROM || "no-reply@snaggle.fun";
-const MAIL_ADMIN = process.env.MAIL_ADMIN || "ralphiezagha1@gmail.com";
+const MAIL_FROM = defineSecret("MAIL_FROM");
+const MAIL_ADMIN = defineSecret("MAIL_ADMIN");
 
+// Email validation regex
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Initialise firebase-admin once at runtime. Avoids hitting the network at module load time.
+if (getApps().length === 0) {
+  initializeApp();
+}
+
+// Create an Express app to handle our HTTP routes
 const app = express();
+
+// Configure CORS, JSON parsing and rate limiting
+app.use(cors({ origin: ["https://snaggle.fun", "http://localhost:5173"] }));
 app.use(express.json());
 app.use(
-  cors({
-    origin: ["https://snaggle.fun", "http://localhost:5173"],
-    methods: ["GET", "POST", "OPTIONS"],
-    credentials: false,
+  rateLimit({
+    windowMs: 60_000, // 1 minute window
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
   })
 );
 
-// Basic rate limit
-const limiter = rateLimit({
-  windowMs: 60_000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
+// Health check route. Useful for monitoring and CI smoke tests.
+app.get("/health", (_req, res) => {
+  res.status(200).send("ok");
 });
-app.use(limiter);
 
-// Health
-app.get("/health", (_req: Request, res: Response) => res.status(200).send("ok"));
-
-// Helper: validate email (simple)
-function validEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-// Waitlist endpoint
-app.post("/api/waitlist", async (req: Request, res: Response) => {
+// Waitlist signup handler
+app.post("/api/waitlist", async (req, res) => {
+  const { email } = req.body ?? {};
+  // Validate that the email exists and matches our regex
+  if (typeof email !== "string" || !EMAIL_RE.test(email)) {
+    res.status(400).json({ ok: false, error: "Invalid email" });
+    return;
+  }
   try {
-    const email = String(req.body?.email || "").trim().toLowerCase();
-    if (!validEmail(email)) {
-      return res.status(400).json({ ok: false, error: "Invalid email" });
-    }
+    const db = getFirestore();
+    // Record the waitlist entry with a server timestamp
+    await db.collection("waitlist").add({ email, createdAt: new Date() });
 
-    // Save to Firestore
-    await db.collection("waitlist").doc(email).set(
-      {
-        email,
-        createdAt: Timestamp.now(),
-      },
-      { merge: true }
+    // Send confirmation to user and notification to admin
+    await sendWaitlistEmails(
+      SENDGRID_API_KEY.value(),
+      MAIL_FROM.value(),
+      MAIL_ADMIN.value(),
+      email
     );
 
-    // Send emails via SendGrid
-    const key = process.env.SENDGRID_API_KEY; // populated via secret at runtime
-    if (key) {
-      sg.setApiKey(key);
-
-      const userMsg = {
-        to: email,
-        from: MAIL_FROM,
-        subject: "You're on the Snaggle waitlist 🎉",
-        text: "Thanks for joining the Snaggle waitlist!",
-      };
-
-      const adminMsg = {
-        to: MAIL_ADMIN,
-        from: MAIL_FROM,
-        subject: "New waitlist signup",
-        text: `Email: ${email}`,
-      };
-
-      await Promise.allSettled([sg.send(userMsg as any), sg.send(adminMsg as any)]);
-    }
-
-    return res.status(200).json({ ok: true });
+    res.json({ ok: true });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ ok: false, error: "Internal error" });
+    console.error("Waitlist error", err);
+    res.status(500).json({ ok: false, error: "Server error" });
   }
 });
 
-// Export ONE https function that mounts the Express app
-export const http = onRequest(
-  {
-    region: "us-central1",
-    cors: false,
-    secrets: [SENDGRID_API_KEY],
-    invoker: "public",
-  },
-  app
+// Export a single HTTPS function that handles both /health and /api/waitlist
+export const waitlist = onRequest(
+  { secrets: [SENDGRID_API_KEY, MAIL_FROM, MAIL_ADMIN] },
+  (req, res) => app(req, res)
 );
