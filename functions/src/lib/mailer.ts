@@ -1,8 +1,8 @@
+// functions/src/lib/mailer.ts
 import sgMail from "@sendgrid/mail";
 import type { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 
-/** Set the SendGrid API key once per cold start */
-export function configureSendgrid(apiKey: string) {
+export function setSendgridKeyOnce(apiKey: string) {
   sgMail.setApiKey(apiKey);
 }
 

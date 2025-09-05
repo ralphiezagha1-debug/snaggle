@@ -3,12 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.configureSendgrid = configureSendgrid;
+exports.setSendgridKeyOnce = setSendgridKeyOnce;
 exports.sendUserConfirmation = sendUserConfirmation;
 exports.sendAdminNotification = sendAdminNotification;
+// functions/src/lib/mailer.ts
 const mail_1 = __importDefault(require("@sendgrid/mail"));
-/** Set the SendGrid API key once per cold start */
-function configureSendgrid(apiKey) {
+function setSendgridKeyOnce(apiKey) {
     mail_1.default.setApiKey(apiKey);
 }
 async function sendUserConfirmation(from, to) {

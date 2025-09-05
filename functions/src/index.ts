@@ -1,81 +1,133 @@
-import { onRequest } from "firebase-functions/v2/https";
-import { defineSecret } from "firebase-functions/params";
+// functions/src/index.ts
 import express from "express";
+import { onRequest } from "firebase-functions/v2/https";
 import cors from "cors";
-import rateLimit from "express-rate-limit";
-import { getFirestore } from "firebase-admin/firestore";
-import { getApps, initializeApp } from "firebase-admin/app";
-import { sendWaitlistEmails } from "./waitlistEmail";
+import Stripe from "stripe";
 
-// Import callable and other HTTP functions
-export { placeBid } from "./placeBid";
-export { createCheckoutSession } from "./createCheckoutSession";
-export { stripeWebhook } from "./stripeWebhook";
-export { sendTestMail } from "./mail";
+import {
+  SENDGRID_API_KEY,
+  MAIL_FROM,
+  MAIL_ADMIN,
+  STRIPE_SECRET_KEY,
+  STRIPE_WEBHOOK_SECRET,
+} from "./config";
 
-// Secrets required for sending waitlist emails
-const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
-const MAIL_FROM = defineSecret("MAIL_FROM");
-const MAIL_ADMIN = defineSecret("MAIL_ADMIN");
+import { setSendgridKeyOnce, sendUserConfirmation, sendAdminNotification } from "./lib/mailer";
+// If you save waitlist emails in Firestore, uncomment these:
+// import { getFirestore, FieldValue } from "firebase-admin/firestore";
+// import { initializeApp } from "firebase-admin/app";
+// initializeApp();
 
-// Email validation regex
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// Initialise firebase-admin once at runtime. Avoids hitting the network at module load time.
-if (getApps().length === 0) {
-  initializeApp();
-}
-
-// Create an Express app to handle our HTTP routes
 const app = express();
 
-// Configure CORS, JSON parsing and rate limiting
-app.use(cors({ origin: ["https://snaggle.fun", "http://localhost:5173"] }));
+// JSON for most routes; raw body specifically for webhook route (see below)
+app.use("/stripe/webhook", express.raw({ type: "application/json" }) as any);
 app.use(express.json());
 app.use(
-  rateLimit({
-    windowMs: 60_000, // 1 minute window
-    max: 5,
-    standardHeaders: true,
-    legacyHeaders: false,
+  cors({
+    origin: ["https://snaggle.fun", "http://localhost:5173"],
+    credentials: true,
   })
 );
 
-// Health check route. Useful for monitoring and CI smoke tests.
-app.get("/health", (_req, res) => {
-  res.status(200).send("ok");
+// --- HEALTH ---
+app.get("/health", (_req, res) => res.status(200).send("ok"));
+
+// --- WAITLIST ---
+app.post("/waitlist", async (req, res) => {
+  try {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!ok) return res.status(400).json({ ok: false, error: "invalid_email" });
+
+    // Secrets at runtime
+    const apiKey = SENDGRID_API_KEY.value();
+    const from = MAIL_FROM.value();
+    const admin = MAIL_ADMIN.value();
+
+    setSendgridKeyOnce(apiKey);
+
+    // OPTIONAL: Save to Firestore
+    // const db = getFirestore();
+    // await db.collection("waitlist").doc(email).set(
+    //   { email, createdAt: FieldValue.serverTimestamp() },
+    //   { merge: true }
+    // );
+
+    await sendUserConfirmation(from, email);
+    await sendAdminNotification(from, admin, email);
+
+    return res.json({ ok: true });
+  } catch (err: any) {
+    console.error("waitlist error:", err);
+    return res.status(500).json({ ok: false, error: "internal" });
+  }
 });
 
-// Waitlist signup handler
-app.post("/api/waitlist", async (req, res) => {
-  const { email } = req.body ?? {};
-  // Validate that the email exists and matches our regex
-  if (typeof email !== "string" || !EMAIL_RE.test(email)) {
-    res.status(400).json({ ok: false, error: "Invalid email" });
-    return;
-  }
+// --- STRIPE CHECKOUT (example) ---
+app.post("/checkout", async (req, res) => {
   try {
-    const db = getFirestore();
-    // Record the waitlist entry with a server timestamp
-    await db.collection("waitlist").add({ email, createdAt: new Date() });
+    const stripe = new Stripe(STRIPE_SECRET_KEY.value(), { apiVersion: "2024-06-20" });
 
-    // Send confirmation to user and notification to admin
-    await sendWaitlistEmails(
-      SENDGRID_API_KEY.value(),
-      MAIL_FROM.value(),
-      MAIL_ADMIN.value(),
-      email
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      line_items: req.body.line_items,
+      success_url: "https://snaggle.fun/success",
+      cancel_url: "https://snaggle.fun/cancel",
+    });
+
+    res.json({ id: session.id });
+  } catch (err: any) {
+    console.error("checkout error:", err);
+    res.status(500).json({ error: "stripe_checkout_failed" });
+  }
+});
+
+// --- STRIPE WEBHOOK ---
+app.post("/stripe/webhook", (req, res) => {
+  try {
+    const stripe = new Stripe(STRIPE_SECRET_KEY.value(), { apiVersion: "2024-06-20" });
+    const sig = req.headers["stripe-signature"] as string;
+
+    const event = stripe.webhooks.constructEvent(
+      (req as any).body, // raw body because of express.raw above
+      sig,
+      STRIPE_WEBHOOK_SECRET.value()
     );
 
-    res.json({ ok: true });
-  } catch (err) {
-    console.error("Waitlist error", err);
-    res.status(500).json({ ok: false, error: "Server error" });
+    // Handle events as needed
+    switch (event.type) {
+      case "checkout.session.completed":
+        // TODO: fulfill purchase
+        break;
+      default:
+        // noop
+        break;
+    }
+
+    return res.json({ received: true });
+  } catch (err: any) {
+    console.error("webhook error:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 });
 
-// Export a single HTTPS function that handles both /health and /api/waitlist
-export const waitlist = onRequest(
-  { secrets: [SENDGRID_API_KEY, MAIL_FROM, MAIL_ADMIN] },
-  (req, res) => app(req, res)
+// Export ONE functions endpoint with declared secrets
+export const api = onRequest(
+  {
+    region: "us-central1",
+    // Declare every secret your routes access
+    secrets: [
+      SENDGRID_API_KEY,
+      MAIL_FROM,
+      MAIL_ADMIN,
+      STRIPE_SECRET_KEY,
+      STRIPE_WEBHOOK_SECRET,
+    ],
+    // Optional: increase timeout/memory if you need it
+    // timeoutSeconds: 60,
+    // memory: "256MiB",
+  },
+  app as any
 );
