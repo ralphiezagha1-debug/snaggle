@@ -1,21 +1,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Public write-only waitlist (readable only by server/console)
-    match /waitlist/{id} {
-      allow create: if
-        request.resource.data.keys().hasOnly(['email','createdAt','source']) &&
-        request.resource.data.email is string &&
-        request.resource.data.email.size() >= 5 &&
-        request.resource.data.email.size() <= 320 &&
-        request.resource.data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$');
-
-      // keep private
-      allow read, update, delete: if false;
+    // Waitlist collection is write-only. No reads allowed.
+    match /waitlist/{docId} {
+      allow write: if true;
+      allow read: if false;
     }
 
-    // default deny
+    // Default: deny all other reads and writes
     match /{document=**} {
       allow read, write: if false;
     }

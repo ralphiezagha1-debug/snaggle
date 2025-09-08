@@ -72,3 +72,5 @@ export const waitlist = onRequest(
   { secrets: [SENDGRID_API_KEY, MAIL_FROM, MAIL_ADMIN] },
   (req, res) => app(req, res)
 );
+
+// touch

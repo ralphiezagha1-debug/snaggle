@@ -7,9 +7,13 @@ const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
 const MAIL_FROM = defineSecret("MAIL_FROM");
 const MAIL_ADMIN = defineSecret("MAIL_ADMIN");
 
+/**
+ * Simple endpoint to verify SendGrid secrets. This function sends a test
+ * email to the configured administrator address when invoked.
+ */
 export const sendTestMail = onRequest(
   { secrets: [SENDGRID_API_KEY, MAIL_FROM, MAIL_ADMIN] },
-  async (req, res) => {
+  async (_req, res) => {
     sgMail.setApiKey(SENDGRID_API_KEY.value());
 
     await sgMail.send({

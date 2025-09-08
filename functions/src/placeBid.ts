@@ -1,18 +1,21 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
-import * as admin from "firebase-admin";
+import { getApps, initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 
 // Safe init (won't throw if already initialized)
-if (admin.apps.length === 0) { admin.initializeApp(); }
+if (getApps().length === 0) {
+  initializeApp();
+}
 
 type PlaceBidData = { auctionId: string };
 
 const BID_COST = 1;
 const TIMER_EXTENSION_MS = 15 * 1000; // 15 seconds
 
-export const placeBid = onCall<PlaceBidData>(async (request) => {
+export const placeBid = onCall(async (request) => {
   const uid = request.auth?.uid;
-  const { auctionId } = request.data ?? {};
+  const { auctionId } = (request.data ?? {}) as PlaceBidData;
 
   if (!uid) {
     throw new HttpsError("unauthenticated", "You must be signed in to place a bid.");
@@ -22,7 +25,7 @@ export const placeBid = onCall<PlaceBidData>(async (request) => {
   }
 
   const db = getFirestore();
-  const auth = admin.auth();
+  const auth = getAuth();
 
   const auctionRef = db.collection("auctions").doc(auctionId);
   const userRef = db.collection("users").doc(uid);
@@ -30,7 +33,7 @@ export const placeBid = onCall<PlaceBidData>(async (request) => {
 
   try {
     const userRecord = await auth.getUser(uid);
-    const userName = userRecord.displayName || 'Anonymous';
+    const userName = userRecord.displayName || "Anonymous";
 
     await db.runTransaction(async (transaction) => {
       const auctionDoc = await transaction.get(auctionRef);
@@ -42,10 +45,10 @@ export const placeBid = onCall<PlaceBidData>(async (request) => {
 
       const auction = auctionDoc.data();
       if (!auction) {
-          throw new HttpsError("data-loss", "Auction data is corrupt.");
+        throw new HttpsError("data-loss", "Auction data is corrupt.");
       }
 
-      if (auction.status !== 'open') {
+      if (auction.status !== "open") {
         throw new HttpsError("failed-precondition", "Auction is not open for bidding.");
       }
 
@@ -59,13 +62,10 @@ export const placeBid = onCall<PlaceBidData>(async (request) => {
         throw new HttpsError("resource-exhausted", "Insufficient credits to place a bid.");
       }
 
-      // 1. Deduct credits
-      // We use update here, which requires the document to exist.
-      // This is a safeguard against creating a credit doc with a negative balance.
-      // A user must have a credit document to be able to bid.
+      // 1. Deduct credits. Use update here to ensure user document exists.
       transaction.update(userRef, {
         credits: FieldValue.increment(-BID_COST),
-        updatedAt: FieldValue.serverTimestamp()
+        updatedAt: FieldValue.serverTimestamp(),
       });
 
       // 2. Add bid to subcollection
@@ -74,7 +74,7 @@ export const placeBid = onCall<PlaceBidData>(async (request) => {
         userId: uid,
         userName: userName,
         createdAt: FieldValue.serverTimestamp(),
-        // The price here is for record-keeping, the authoritative price is on the auction doc.
+        // The price here is for record-keeping; the authoritative price is on the auction doc
         amount: auction.currentPrice + auction.bidIncrement,
       });
 
@@ -91,12 +91,12 @@ export const placeBid = onCall<PlaceBidData>(async (request) => {
 
     return { ok: true };
   } catch (error: any) {
-    if (error.code === 'firestore/not-found' && error.message.includes('users')) {
-        throw new HttpsError('resource-exhausted', 'Insufficient credits to place a bid.');
+    if (error.code === "firestore/not-found" && error.message.includes("users")) {
+      throw new HttpsError("resource-exhausted", "Insufficient credits to place a bid.");
     }
     if (!(error instanceof HttpsError)) {
       console.error("Unexpected error placing bid:", error);
-      throw new HttpsError('internal', 'An unexpected error occurred.');
+      throw new HttpsError("internal", "An unexpected error occurred.");
     }
     throw error;
   }

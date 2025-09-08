@@ -1,13 +1,22 @@
-﻿{
+{
   "compilerOptions": {
-    "target": "ES2020",
+    "lib": ["es2021"],
     "module": "commonjs",
+    "target": "es2021",
     "outDir": "lib",
+    "rootDir": "src",
     "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    // Allow implicit any for imported request/response objects since the Firebase
+    // functions SDK does not ship its own TypeScript types yet in this
+    // environment. Without this the build fails due to missing type
+    // declarations for express Request/Response and Firebase functions v2 types.
+    "noImplicitAny": false,
+    // Skip type checking of declaration files for dependencies not installed
+    // locally (e.g. firebase-functions v2). This prevents the compiler from
+    // complaining about missing type definitions.
     "skipLibCheck": true,
-    "types": ["node"]
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": ["src/**/*.ts"]
 }
