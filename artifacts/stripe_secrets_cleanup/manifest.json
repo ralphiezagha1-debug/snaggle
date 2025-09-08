@@ -1,0 +1,12 @@
+{
+  "branch": "fix/infra-stripe-secrets-overlap",
+  "modified": ["firebase.json", "functions/src/index.ts"],
+  "created": [],
+  "deleted": [],
+  "untouched_but_scanned": [".env", "functions/.env", ".env.local", "functions/.env.local"],
+  "secrets_used": ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "SENDGRID_API_KEY", "MAIL_FROM", "MAIL_ADMIN"],
+  "notes": {
+    "reason": "Remove duplicate non-secret envs and declare secrets in Gen2",
+    "risk": "Low; config-only change"
+  }
+}
