@@ -50,6 +50,40 @@ jobs:
       - name: Install Firebase CLI
         run: npm i -g firebase-tools@latest
       - name: Authenticate to Google (service account)
+- name: Debug active gcloud identity and SA permissions
+  shell: bash
+  run: |
+    set -euo pipefail
+    echo "== gcloud version =="
+    gcloud --version
+
+    echo "== Project =="
+    gcloud config set project "$PROJECT_ID" >/dev/null
+    gcloud config list --format="text(core.project)"
+
+    echo "== Active account =="
+    gcloud auth list --filter=status:ACTIVE --format="value(account)"
+
+    echo "== Creds file (if using WIF) =="
+    echo "GOOGLE_GHA_CREDS_PATH=${GOOGLE_GHA_CREDS_PATH:-<unset>}"
+    if [[ -n "${GOOGLE_GHA_CREDS_PATH:-}" && -f "$GOOGLE_GHA_CREDS_PATH" ]]; then
+      python3 - <<'PY'
+import json, os
+p=os.environ.get("GOOGLE_GHA_CREDS_PATH","")
+try:
+  print("creds.client_email=", json.load(open(p)).get("client_email"))
+except Exception as e:
+  print("creds.client_email=<unreadable>", e)
+PY
+    fi
+
+    echo "== Test iam.serviceAccounts.actAs on runtime SA =="
+    gcloud iam service-accounts test-iam-permissions "$PROJECT_ID@appspot.gserviceaccount.com" \
+      --permissions=iam.serviceAccounts.actAs --format=json || true
+
+    echo "== Current policy on runtime SA =="
+    gcloud iam service-accounts get-iam-policy "$PROJECT_ID@appspot.gserviceaccount.com" \
+      --format="table(bindings.role, bindings.members)"
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
