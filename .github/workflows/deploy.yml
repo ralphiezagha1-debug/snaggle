@@ -1,93 +1,47 @@
-name: verify-and-deploy
+﻿name: Deploy (Hosting + Functions)
+
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-concurrency:
-  group: deploy-main
-  cancel-in-progress: true
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
-  verify:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: 'npm'
+
       - name: Install root deps
-        run: npm ci || npm install --no-audit --no-fund
-      - name: Install functions deps
-        run: npm ci --prefix functions || npm install --prefix functions --no-audit --no-fund
-      - name: Lint (best-effort)
-        run: npm run lint --if-present || true
-      - name: Typecheck web
-        run: npm run typecheck --if-present
-      - name: Typecheck functions
-        run: npm run typecheck --prefix functions --if-present
+        run: npm ci
+
       - name: Build web
-        run: npm run build --if-present
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
+        run: npm run build
 
-  deploy:
-    needs: verify
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist
-      - name: Install Firebase CLI
-        run: npm i -g firebase-tools@latest
-      - name: Authenticate to Google (service account)
-- name: Debug active gcloud identity and SA permissions
-  shell: bash
-  run: |
-    set -euo pipefail
-    echo "== gcloud version =="
-    gcloud --version
+      - name: Install functions deps
+        working-directory: functions
+        run: npm ci
 
-    echo "== Project =="
-    gcloud config set project "$PROJECT_ID" >/dev/null
-    gcloud config list --format="text(core.project)"
-
-    echo "== Active account =="
-    gcloud auth list --filter=status:ACTIVE --format="value(account)"
-
-    echo "== Creds file (if using WIF) =="
-    echo "GOOGLE_GHA_CREDS_PATH=${GOOGLE_GHA_CREDS_PATH:-<unset>}"
-    if [[ -n "${GOOGLE_GHA_CREDS_PATH:-}" && -f "$GOOGLE_GHA_CREDS_PATH" ]]; then
-      python3 - <<'PY'
-import json, os
-p=os.environ.get("GOOGLE_GHA_CREDS_PATH","")
-try:
-  print("creds.client_email=", json.load(open(p)).get("client_email"))
-except Exception as e:
-  print("creds.client_email=<unreadable>", e)
-PY
-    fi
-
-    echo "== Test iam.serviceAccounts.actAs on runtime SA =="
-    gcloud iam service-accounts test-iam-permissions "$PROJECT_ID@appspot.gserviceaccount.com" \
-      --permissions=iam.serviceAccounts.actAs --format=json || true
-
-    echo "== Current policy on runtime SA =="
-    gcloud iam service-accounts get-iam-policy "$PROJECT_ID@appspot.gserviceaccount.com" \
-      --format="table(bindings.role, bindings.members)"
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      - name: Deploy functions + hosting (snaggle-ed88d)
+      - name: Typecheck / build functions (no-op if scripts missing)
+        working-directory: functions
         run: |
-          echo "Deploying to snaggle-ed88d..."
-          firebase deploy --only functions,hosting --project snaggle-ed88d --non-interactive --force --debug
+          npm run typecheck --if-present
+          npm run build --if-present
+
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@v13.27.1
+        with:
+          args: deploy --only hosting,functions --project snaggle-ed88d
+        env:
+          GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SNAGGLE_ED88D }}
