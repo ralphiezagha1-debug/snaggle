@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   build-and-deploy:
@@ -41,15 +40,11 @@ jobs:
           npm run typecheck --if-present
           npm run build --if-present
 
-      # ---- Auth with Service Account JSON secret ----
-      - name: Google auth (service account)
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SNAGGLE_ED88D }}
-
-      # ---- Deploy via Firebase CLI ----
+      # ---- Deploy via Firebase CLI using FIREBASE_TOKEN ----
       - name: Install Firebase CLI
         run: npm i -g firebase-tools
 
       - name: Deploy Hosting + Functions
         run: firebase deploy --only hosting,functions --project snaggle-ed88d
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
