@@ -1,97 +1,225 @@
-﻿import { HowItWorks } from "@/sections/HowItWorks";
-import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { AuctionCard } from '@/components/auction/AuctionCard';
-import { Footer } from "@/components/Footer";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Gavel, Zap, Trophy, Clock, Users, Star } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Clock, Trophy, Zap, Shield, Users, TrendingUp } from "lucide-react";
 
-export default function Index() {
+const Home = () => {
+  // Mock featured auctions
+  const featuredAuctions = [
+    {
+      id: "1",
+      title: "Vintage 1965 Gibson Les Paul",
+      currentBid: 8750,
+      endTime: "2h 34m",
+      bidCount: 23,
+      image: "/api/placeholder/300/200",
+      featured: true,
+    },
+    {
+      id: "2", 
+      title: "Original Banksy Street Art",
+      currentBid: 15420,
+      endTime: "1d 5h",
+      bidCount: 67,
+      image: "/api/placeholder/300/200",
+      featured: true,
+    },
+    {
+      id: "3",
+      title: "Rolex Submariner (1970)",
+      currentBid: 12300,
+      endTime: "4h 12m", 
+      bidCount: 45,
+      image: "/api/placeholder/300/200",
+      featured: false,
+    },
+  ];
+
+  const features = [
+    {
+      icon: Zap,
+      title: "Real-Time Bidding",
+      description: "Lightning-fast bid processing with instant updates and no delays."
+    },
+    {
+      icon: Shield,
+      title: "Secure Transactions",
+      description: "Bank-level security with verified sellers and protected payments."
+    },
+    {
+      icon: Users,
+      title: "Curated Community",
+      description: "Join thousands of collectors and enthusiasts worldwide."
+    },
+    {
+      icon: TrendingUp,
+      title: "Market Insights",
+      description: "Get real-time market data and price trends for informed bidding."
+    },
+  ];
+
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-background text-foreground">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 text-center overflow-hidden">
-        <div className="absolute inset-0" style={{background: 'radial-gradient(800px 400px at 20% 0%, hsl(var(--primary)/.15), transparent 70%)'}}></div>
-        <div className="container mx-auto relative z-10">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <Gavel className="w-12 h-12 text-primary" />
-            <h1 className="text-5xl md:text-6xl font-bold">
-              Welcome to <span className="text-primary">Snaggle</span>
+      <section className="relative overflow-hidden bg-gradient-hero py-24 lg:py-32">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-snaggle-green bg-clip-text text-transparent">
+              Win What You Want.<br />
+              <span className="text-primary">Bid What It's Worth.</span>
             </h1>
-          </div>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            The ultimate penny auction experience. Bid smart, save big, and win amazing products
-            at unbelievable prices. Every bid counts!
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button size="lg" className="bg-primary text-primary-foreground shadow-lg text-lg px-8">
-              <Zap className="w-5 h-5 mr-2" />
-              Start Bidding Now
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8">
-              <Clock className="w-5 h-5 mr-2" />
-              How It Works
-            </Button>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <Card className="text-center bg-card">
-              <CardHeader>
-                <Trophy className="w-8 h-8 text-primary mx-auto mb-2" />
-                <CardTitle className="text-2xl font-bold text-primary">2,847</CardTitle>
-                <p className="text-muted-foreground">Winners This Month</p>
-              </CardHeader>
-            </Card>
-            <Card className="text-center bg-card">
-              <CardHeader>
-                <Users className="w-8 h-8 text-primary mx-auto mb-2" />
-                <CardTitle className="text-2xl font-bold text-primary">12,394</CardTitle>
-                <p className="text-muted-foreground">Active Bidders</p>
-              </CardHeader>
-            </Card>
-            <Card className="text-center bg-card">
-              <CardHeader>
-                <Star className="w-8 h-8 text-primary mx-auto mb-2" />
-                <CardTitle className="text-2xl font-bold text-primary">$2.4M</CardTitle>
-                <p className="text-muted-foreground">Total Savings</p>
-              </CardHeader>
-            </Card>
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+              The premium live auction platform where collectors, enthusiasts, and investors 
+              compete for the world's most coveted items.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" className="glow-green text-lg px-8 py-6">
+                <Link to="/auctions">
+                  Browse Live Auctions
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="secondary" size="lg" className="text-lg px-8 py-6">
+                <Link to="/how-it-works">Learn How It Works</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Auctions Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
+      {/* Featured Auctions */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Live Auctions</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of smart shoppers who save up to 95% on brand new products.
-              Every auction starts at $0.00 and increases by just $0.01 per bid!
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Featured Auctions
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Discover exceptional items ending soon
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <AuctionCard id="1" title="Apple AirPods Pro (2nd Gen) with MagSafe Charging Case" />
-            <AuctionCard id="2" title="Samsung 27Ã¢â‚¬Â 4K UHD Monitor (IPS, 60Hz) - 2024 Model" />
-            <AuctionCard id="3" title="Nintendo Switch OLED - White Joy-Con" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {featuredAuctions.map((auction) => (
+              <Card key={auction.id} className="bg-gradient-card border-card-border hover:border-primary/50 transition-all duration-300 group">
+                <div className="relative">
+                  <div className="aspect-video bg-muted rounded-t-lg flex items-center justify-center">
+                    <span className="text-muted-foreground">Image Placeholder</span>
+                  </div>
+                  {auction.featured && (
+                    <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">
+                      Featured
+                    </Badge>
+                  )}
+                  <div className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center space-x-1">
+                    <Clock className="h-3 w-3 text-destructive" />
+                    <span className="text-xs font-medium">{auction.endTime}</span>
+                  </div>
+                </div>
+                <CardHeader>
+                  <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
+                    {auction.title}
+                  </CardTitle>
+                  <CardDescription className="flex items-center justify-between">
+                    <span>Current Bid</span>
+                    <span className="text-primary font-semibold">
+                      ${auction.currentBid.toLocaleString()}
+                    </span>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      {auction.bidCount} bids
+                    </span>
+                    <Button asChild variant="secondary" size="sm">
+                      <Link to={`/auctions/${auction.id}`}>
+                        View Auction
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          
+          <div className="text-center">
+            <Button asChild variant="outline" size="lg">
+              <Link to="/auctions">
+                View All Auctions
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
 
-      <Footer />
+      {/* Features */}
+      <section className="py-20 bg-gradient-card">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Why Choose Snaggle?
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Experience the future of online auctions with cutting-edge technology 
+              and unmatched reliability.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <Card key={feature.title} className="text-center border-card-border bg-card/50">
+                  <CardHeader>
+                    <div className="mx-auto mb-4 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <Card className="bg-gradient-hero border-primary/20 text-center p-12">
+            <CardHeader>
+              <div className="flex justify-center mb-6">
+                <Trophy className="h-16 w-16 text-primary" />
+              </div>
+              <CardTitle className="text-3xl md:text-4xl font-bold mb-4">
+                Ready to Start Winning?
+              </CardTitle>
+              <CardDescription className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Join thousands of successful bidders who trust Snaggle for their most important purchases.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+              <Button asChild size="lg" className="glow-green text-lg px-8">
+                <Link to="/signup">
+                  Create Your Account
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="text-lg px-8">
+                <Link to="/waitlist">Join Our Waitlist</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     </div>
   );
-}
+};
 
-
-
-
-
-
-{/* How It Works section */}
-<HowItWorks />
-
+export default Home;
