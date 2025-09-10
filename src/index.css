@@ -1,20 +1,126 @@
-﻿@import "./theme.css";
-@import './styles/theme.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html, body, #root { height: 100%; }
+/* Snaggle Design System - Green/Black Gradient Theme */
 
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+@layer base {
+  :root {
+    /* Core Background System */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 98%;
+    
+    /* Snaggle Green Palette */
+    --snaggle-green: 142 86% 55%;
+    --snaggle-green-dark: 142 86% 45%;
+    --snaggle-green-light: 142 86% 65%;
+    --snaggle-green-glow: 142 86% 55%;
+    
+    /* Card System */
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 95%;
+    --card-border: 0 0% 12%;
+    
+    /* Primary Actions (Snaggle Green) */
+    --primary: 142 86% 55%;
+    --primary-foreground: 0 0% 3%;
+    --primary-hover: 142 86% 45%;
+    
+    /* Secondary Actions */
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 85%;
+    --secondary-hover: 0 0% 15%;
+    
+    /* Muted/Subtle */
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 60%;
+    
+    /* Accent */
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 90%;
+    
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders & Inputs */
+    --border: 0 0% 12%;
+    --input: 0 0% 8%;
+    --input-border: 0 0% 15%;
+    --ring: 142 86% 55%;
+    
+    /* Gradients */
+    --gradient-radial: radial-gradient(circle at 50% 50%, hsl(142 86% 55% / 0.15) 0%, hsl(0 0% 3%) 50%);
+    --gradient-hero: radial-gradient(ellipse at center, hsl(142 86% 55% / 0.2) 0%, hsl(0 0% 3%) 70%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 6%), hsl(0 0% 4%));
+    
+    /* Shadows & Glows */
+    --shadow-glow: 0 0 40px hsl(142 86% 55% / 0.3);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
+    --shadow-button: 0 0 20px hsl(142 86% 55% / 0.4);
+    
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  :where(*) { border-color: hsl(var(--border)); }
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background: var(--gradient-radial);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  
+  /* Scrollbar styling for dark theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
 }
 
+@layer components {
+  /* Glow utilities */
+  .glow-green {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .glow-green-hover:hover {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  /* Gradient backgrounds */
+  .bg-gradient-radial {
+    background: var(--gradient-radial);
+  }
+  
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .bg-gradient-card {
+    background: var(--gradient-card);
+  }
+}
