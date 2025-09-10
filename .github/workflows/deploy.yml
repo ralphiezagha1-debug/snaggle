@@ -23,25 +23,33 @@ jobs:
           node-version: 20
           cache: 'npm'
 
+      # ---- Root (Vite) ----
       - name: Install root deps
         run: npm ci
 
       - name: Build web
         run: npm run build
 
+      # ---- Functions (TypeScript) ----
       - name: Install functions deps
         working-directory: functions
         run: npm ci
 
-      - name: Typecheck / build functions (no-op if scripts missing)
+      - name: Typecheck / build functions
         working-directory: functions
         run: |
           npm run typecheck --if-present
           npm run build --if-present
 
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@v13
+      # ---- Auth to Google with a Service Account JSON secret ----
+      - name: Google auth (service account)
+        uses: google-github-actions/auth@v2
         with:
-          args: deploy --only hosting,functions --project snaggle-ed88d
-        env:
-          GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SNAGGLE_ED88D }}
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SNAGGLE_ED88D }}
+
+      # ---- Deploy via Firebase CLI ----
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools
+
+      - name: Deploy Hosting + Functions
+        run: firebase deploy --only hosting,functions --project snaggle-ed88d
