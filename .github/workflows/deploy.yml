@@ -25,7 +25,7 @@ jobs:
 
       # ---- Root (Vite) ----
       - name: Install root deps
-        run: npm ci
+        run: npm install --no-audit --no-fund --legacy-peer-deps
 
       - name: Build web
         run: npm run build
@@ -33,7 +33,7 @@ jobs:
       # ---- Functions (TypeScript) ----
       - name: Install functions deps
         working-directory: functions
-        run: npm ci
+        run: npm install --no-audit --no-fund --legacy-peer-deps
 
       - name: Typecheck / build functions
         working-directory: functions
@@ -41,7 +41,7 @@ jobs:
           npm run typecheck --if-present
           npm run build --if-present
 
-      # ---- Auth to Google with a Service Account JSON secret ----
+      # ---- Auth with Service Account JSON secret ----
       - name: Google auth (service account)
         uses: google-github-actions/auth@v2
         with:
