@@ -6,6 +6,18 @@
 
 @layer base {
   :root {
+    --snaggle-glow: radial-gradient(
+    1200px 600px at 50% -10%,
+    rgba(0, 255, 140, 0.35) 0%,
+    rgba(0, 255, 140, 0.18) 22%,
+    rgba(0, 0, 0, 0) 60%
+  ),
+  radial-gradient(
+    900px 500px at 80% 20%,
+    rgba(0, 255, 140, 0.15) 0%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  --snaggle-bg: #000;
     /* Core Background System */
     --background: 0 0% 3%;
     --foreground: 0 0% 98%;
@@ -123,4 +135,10 @@
   .bg-gradient-card {
     background: var(--gradient-card);
   }
+}
+.snaggle-glow {
+  background: var(--snaggle-bg);
+  background-image: var(--snaggle-glow);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }

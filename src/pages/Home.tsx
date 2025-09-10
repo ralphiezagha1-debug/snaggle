@@ -60,7 +60,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="snaggle-glow min-h-screen">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-hero py-24 lg:py-32">
         <div className="container mx-auto px-4">
