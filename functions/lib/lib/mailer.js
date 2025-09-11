@@ -3,14 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setSendgridKeyOnce = setSendgridKeyOnce;
-exports.sendUserConfirmation = sendUserConfirmation;
-exports.sendAdminNotification = sendAdminNotification;
+exports.sendAdminNotification = exports.sendUserConfirmation = exports.setSendgridKeyOnce = void 0;
 // functions/src/lib/mailer.ts
 const mail_1 = __importDefault(require("@sendgrid/mail"));
 function setSendgridKeyOnce(apiKey) {
     mail_1.default.setApiKey(apiKey);
 }
+exports.setSendgridKeyOnce = setSendgridKeyOnce;
 async function sendUserConfirmation(from, to) {
     const msg = {
         to,
@@ -24,6 +23,7 @@ async function sendUserConfirmation(from, to) {
     };
     await mail_1.default.send(msg);
 }
+exports.sendUserConfirmation = sendUserConfirmation;
 async function sendAdminNotification(from, adminTo, userEmail) {
     const msg = {
         to: adminTo,
@@ -36,3 +36,4 @@ async function sendAdminNotification(from, adminTo, userEmail) {
     };
     await mail_1.default.send(msg);
 }
+exports.sendAdminNotification = sendAdminNotification;

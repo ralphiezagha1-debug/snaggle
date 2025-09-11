@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendWaitlistEmails = sendWaitlistEmails;
+exports.sendWaitlistEmails = void 0;
 const mail_1 = __importDefault(require("@sendgrid/mail"));
 /**
  * Sends both the user confirmation and the admin notification emails.
@@ -36,3 +36,4 @@ async function sendWaitlistEmails(apiKey, from, adminTo, userEmail) {
         html: `<p>New waitlist signup: ${userEmail}</p>`,
     });
 }
+exports.sendWaitlistEmails = sendWaitlistEmails;
