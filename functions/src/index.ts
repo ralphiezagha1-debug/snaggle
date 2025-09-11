@@ -1,4 +1,4 @@
-import { onRequest } from "firebase-functions/v2/https";
+﻿import { onRequest } from "firebase-functions/v2/https";
 import express from "express";
 
 // Keep a simple HTTP app alive for existing routing
@@ -14,3 +14,10 @@ export { waitlist } from "./waitlist";
 
 // New auth trigger (SendGrid welcome/verify)
 export { authOnCreate } from "./authOnCreate";
+
+
+
+
+
+export { sendgridTestV2 } from './sendgridTestV2';
+
