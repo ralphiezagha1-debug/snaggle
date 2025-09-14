@@ -1,4 +1,4 @@
-// functions/src/mail.ts
+﻿// functions/src/mail.ts
 import { onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import sgMail from "@sendgrid/mail";
@@ -23,6 +23,7 @@ export const sendTestMail = onRequest(
       text: "If you got this, SendGrid secrets are working!",
     });
 
-    res.send("✅ Test email sent");
+    res.send("âœ… Test email sent");
   }
 );
+

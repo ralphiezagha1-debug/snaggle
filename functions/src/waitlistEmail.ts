@@ -1,10 +1,10 @@
-import sgMail from "@sendgrid/mail";
+﻿import sgMail from "@sendgrid/mail";
 
 /**
  * Sends both the user confirmation and the admin notification emails.
  *
  * @param apiKey   SendGrid API key to authenticate the client
- * @param from     The sender address (e.g. no‑reply@snaggle.fun)
+ * @param from     The sender address (e.g. noâ€‘reply@snaggle.fun)
  * @param adminTo  The administrator address to notify of new signups
  * @param userEmail The new waitlist member's email address
  */
@@ -21,12 +21,12 @@ export async function sendWaitlistEmails(
   await sgMail.send({
     to: userEmail,
     from,
-    subject: "You’re on the Snaggle waitlist 🎉",
+    subject: "Youâ€™re on the Snaggle waitlist ðŸŽ‰",
     text:
-      "Thanks for joining the Snaggle waitlist! We’ll email you with early access and launch updates.",
+      "Thanks for joining the Snaggle waitlist! Weâ€™ll email you with early access and launch updates.",
     html: `
-      <p>Welcome to Snaggle 🎉</p>
-      <p>Thanks for joining the waitlist! We’ll email you with early access and launch updates.</p>
+      <p>Welcome to Snaggle ðŸŽ‰</p>
+      <p>Thanks for joining the waitlist! Weâ€™ll email you with early access and launch updates.</p>
     `,
   });
 
@@ -39,3 +39,4 @@ export async function sendWaitlistEmails(
     html: `<p>New waitlist signup: ${userEmail}</p>`,
   });
 }
+

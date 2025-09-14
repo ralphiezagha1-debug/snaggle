@@ -1,4 +1,4 @@
-// functions/src/lib/mailer.ts
+﻿// functions/src/lib/mailer.ts
 import sgMail from "@sendgrid/mail";
 import type { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 
@@ -10,11 +10,11 @@ export async function sendUserConfirmation(from: string, to: string) {
   const msg: MailDataRequired = {
     to,
     from,
-    subject: "You’re on the Snaggle waitlist 🎉",
-    text: "Thanks for joining the Snaggle waitlist! We’ll email you with early access and launch updates.",
+    subject: "Youâ€™re on the Snaggle waitlist ðŸŽ‰",
+    text: "Thanks for joining the Snaggle waitlist! Weâ€™ll email you with early access and launch updates.",
     html: `<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5">
-      <h2>Welcome to Snaggle 🎉</h2>
-      <p>Thanks for joining the waitlist! We’ll email you with early access and launch updates.</p>
+      <h2>Welcome to Snaggle ðŸŽ‰</h2>
+      <p>Thanks for joining the waitlist! Weâ€™ll email you with early access and launch updates.</p>
     </div>`,
   };
   await sgMail.send(msg);
@@ -32,3 +32,5 @@ export async function sendAdminNotification(from: string, adminTo: string, userE
   };
   await sgMail.send(msg);
 }
+
+

@@ -1,6 +1,6 @@
-// These ambient module declarations allow TypeScript to compile without
+﻿// These ambient module declarations allow TypeScript to compile without
 // resolving types from external packages that are not installed locally. The
-// Firebase Functions v2 SDK and other third‑party libraries rely on their own
+// Firebase Functions v2 SDK and other thirdâ€‘party libraries rely on their own
 // type definitions which are not available in this build environment. Declaring
 // them as `any` prevents compile errors while still allowing the functions to
 // run at runtime on the Cloud Functions platform.
@@ -67,3 +67,4 @@ declare module "express" {
   const exp: any;
   export default exp;
 }
+

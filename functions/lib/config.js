@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.STRIPE_WEBHOOK_SECRET = exports.STRIPE_SECRET_KEY = exports.MAIL_ADMIN = exports.MAIL_FROM = exports.SENDGRID_API_KEY = void 0;
 // functions/src/config.ts
-const params_1 = require("firebase-functions/params");
+import { defineSecret } from "firebase-functions/params";
 /** SendGrid */
-exports.SENDGRID_API_KEY = (0, params_1.defineSecret)("SENDGRID_API_KEY");
-exports.MAIL_FROM = (0, params_1.defineSecret)("MAIL_FROM");
-exports.MAIL_ADMIN = (0, params_1.defineSecret)("MAIL_ADMIN");
+export const SENDGRID_API_KEY = defineSecret("SENDGRID_API_KEY");
+export const MAIL_FROM = defineSecret("MAIL_FROM");
+export const MAIL_ADMIN = defineSecret("MAIL_ADMIN");
 /** Stripe (only if you actually use these) */
-exports.STRIPE_SECRET_KEY = (0, params_1.defineSecret)("STRIPE_SECRET_KEY");
-exports.STRIPE_WEBHOOK_SECRET = (0, params_1.defineSecret)("STRIPE_WEBHOOK_SECRET");
+export const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
+export const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
