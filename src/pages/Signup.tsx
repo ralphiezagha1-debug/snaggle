@@ -61,7 +61,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12">
+    <div className="min-h-screen flex items-center justify-center py-12 snaggle-glow">
       <div className="container mx-auto px-4">
         <div className="max-w-md mx-auto">
           {/* Logo */}

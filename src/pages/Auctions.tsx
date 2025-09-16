@@ -121,7 +121,7 @@ const Auctions = () => {
   };
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen py-8 snaggle-glow">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">

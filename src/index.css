@@ -6,17 +6,10 @@
 
 @layer base {
   :root {
-    --snaggle-glow: radial-gradient(
-    1200px 600px at 50% -10%,
-    rgba(0, 255, 140, 0.35) 0%,
-    rgba(0, 255, 140, 0.18) 22%,
-    rgba(0, 0, 0, 0) 60%
-  ),
-  radial-gradient(
-    900px 500px at 80% 20%,
-    rgba(0, 255, 140, 0.15) 0%,
-    rgba(0, 0, 0, 0) 70%
-  );
+  --snaggle-glow: #10b981;
+  --snaggle-glow-opacity: 0.20; /* bump to 0.32 if too dim */
+  --snaggle-glow-size: 55rem;
+  --snaggle-glow-soften: 42px;
   --snaggle-bg: #000;
     /* Core Background System */
     --background: 0 0% 3%;
@@ -136,9 +129,16 @@
     background: var(--gradient-card);
   }
 }
-.snaggle-glow {
-  background: var(--snaggle-bg);
-  background-image: var(--snaggle-glow);
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+.snaggle-glow { position: relative; isolation:isolate; overflow:hidden; }
+.snaggle-glow::before {
+  content:""; position:absolute; z-index:0; left:50%; top:-20%;
+  transform:translateX(-50%); width:var(--snaggle-glow-size); height:var(--snaggle-glow-size);
+  border-radius:9999px;
+  background: radial-gradient(ellipse at center,
+    color-mix(in oklab, var(--snaggle-glow) 100%, transparent) 0%,
+    transparent 62%);
+  opacity:var(--snaggle-glow-opacity);
+  filter:blur(var(--snaggle-glow-soften));
+  mix-blend-mode:normal;
 }
+.snaggle-glow>* { position:relative; z-index:1; }
