@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Important pages
+Allow: /auctions
+Allow: /categories
+Allow: /search
+Allow: /how-it-works
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /help
+
+# Disallow admin/private areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /profile
+Disallow: /orders
+Disallow: /wallet
+
+# Sitemap
+Sitemap: https://snaggle.app/sitemap.xml

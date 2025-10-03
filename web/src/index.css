@@ -1,0 +1,246 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Snaggle Design System - Premium Luxury Base */
+
+@layer base {
+  :root {
+    /* Core Background System - Light Theme */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 5%;
+    
+    /* Snag Design System */
+    --snag-charcoal: #0D0D0D;
+    --snag-navy: #0A0F24;
+    --snag-purple: #1B1036;
+    --snag-neon: #00FF80;
+    --snag-blue: #007BFF;
+    --snag-gold: #E7B10A;
+    --snag-neon-strong: #00C46A;
+    
+    /* Snaggle Brand Colors */
+    --snaggle-green: 158 100% 50%; /* #00FF80 Neon Green */
+    --snaggle-blue: 211 100% 50%; /* #007BFF Royal Blue */
+    --snaggle-gold: 45 100% 51%; /* #FFD700 */
+    --snaggle-trust-blue: 196 100% 65%; /* Bright Trust Blue */
+    
+    /* Card System */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 5%;
+    --card-border: 0 0% 88%;
+    
+    /* Primary Actions */
+    --primary: 211 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary Actions */
+    --secondary: 0 0% 88%;
+    --secondary-foreground: 0 0% 15%;
+    
+    /* Muted/Subtle */
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 40%;
+    
+    /* Accent (Gold) */
+    --accent: 45 100% 51%;
+    --accent-foreground: 0 0% 0%;
+    
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders & Inputs */
+    --border: 0 0% 88%;
+    --input: 0 0% 96%;
+    --input-border: 0 0% 85%;
+    --ring: 158 100% 50%;
+    
+    /* Premium Diagonal Gradient */
+    --gradient-base: linear-gradient(135deg, #121212 0%, #0A0F24 50%, #1B1036 100%);
+    --gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    
+    /* Embedded Glow - Inner Shadow */
+    --shadow-logo-inner: 0 2px 8px rgba(0, 255, 128, 0.3) inset, 0 0 12px rgba(0, 255, 128, 0.4);
+    --shadow-hero-inner: 0 2px 10px rgba(0, 255, 128, 0.25) inset, 0 0 15px rgba(0, 255, 128, 0.35);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-cta-hover: 0 0 20px rgba(0, 255, 128, 0.6);
+    
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply text-white bg-snag-gradient;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  
+  /* Dark theme overrides */
+  .dark {
+    --background: 220 30% 8%;
+    --foreground: 0 0% 100%;
+    --card: 220 20% 8%;
+    --card-foreground: 0 0% 98%;
+    --card-border: 220 20% 12%;
+    --muted: 220 20% 10%;
+    --muted-foreground: 0 0% 65%;
+    --border: 220 20% 12%;
+    --input: 220 20% 10%;
+    --gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  }
+  
+  /* Scrollbar styling for dark theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+}
+
+@layer components {
+  /* Snag Design System Classes */
+  .bg-snag-gradient {
+    background: 
+      radial-gradient(1100px 500px at 15% -10%, rgba(60,255,107,0.10), transparent),
+      radial-gradient(900px 400px at 85% 0%, rgba(60,255,107,0.10), transparent),
+      radial-gradient(1200px 600px at 50% 40%, rgba(60,255,107,0.10), transparent),
+      radial-gradient(1000px 500px at 30% 70%, rgba(60,255,107,0.01), transparent),
+      radial-gradient(1200px 600px at 50% 100%, rgba(60,255,107,0.01), transparent),
+      #0a0d0a;
+  }
+  
+  .snag-headline {
+    color: var(--snag-neon);
+    text-shadow: 0 0 22px rgba(0,255,128,.35), 0 1px 0 rgba(0,0,0,.6);
+  }
+  
+  .snag-inner {
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,.04);
+  }
+
+  /* Embedded glow - inner shadow effect */
+  .logo-glow {
+    text-shadow: 0 0 12px rgba(0, 255, 128, 0.4), 0 2px 8px rgba(0, 255, 128, 0.3);
+  }
+  
+  .hero-glow {
+    text-shadow: 0 0 15px rgba(0, 255, 128, 0.35), 0 2px 10px rgba(0, 255, 128, 0.25);
+  }
+  
+  /* Gradient backgrounds */
+  .bg-gradient-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  }
+  
+  /* Glass effect for CTAs */
+  .glass-effect {
+    background: rgba(0, 123, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Pulse animation for primary CTA */
+  @keyframes cta-pulse {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(0, 255, 128, 0.6);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(0, 255, 128, 0.8);
+    }
+  }
+  
+  .cta-pulse:hover {
+    animation: cta-pulse 2s ease-in-out infinite;
+  }
+  
+  /* Soft pulse for timer <60s */
+  @keyframes timer-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  
+  .timer-pulse {
+    animation: timer-pulse 1.5s ease-in-out infinite;
+  }
+  
+  /* Neon green divider */
+  .neon-divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, #00FF80 50%, transparent 100%);
+    box-shadow: 0 0 4px rgba(0, 255, 128, 0.3);
+  }
+  
+  /* Quick Bid button */
+  .quick-bid-btn {
+    background: #00C46A;
+    color: white;
+    border-radius: 9999px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 196, 106, 0.2);
+    transition: all 0.2s ease;
+  }
+  
+  .quick-bid-btn:hover {
+    background: #00D474;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 196, 106, 0.3);
+  }
+  
+  .quick-bid-btn:disabled {
+    opacity: 0.6;
+    transform: none;
+    cursor: not-allowed;
+  }
+  
+  /* Timer urgency styling */
+  .timer-urgent {
+    color: #E7B10A;
+    background: rgba(231, 177, 10, 0.1);
+    border-color: rgba(231, 177, 10, 0.3);
+  }
+  
+  .timer-urgent-pulse {
+    animation: timer-urgent-pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes timer-urgent-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+  
+  /* Card hover with neon green border glow */
+  .card-hover-glow:hover {
+    border-color: #00FF80;
+    box-shadow: 0 0 16px rgba(0, 255, 128, 0.4), 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+}
